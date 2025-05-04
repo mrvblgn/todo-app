@@ -42,38 +42,18 @@ class Todo extends Model
         return $this->belongsToMany(Category::class, 'category_todo');
     }
 
-    public function isPending(): bool
+    public function hasStatus(string $status): bool
     {
-        return $this->status === self::STATUS_PENDING;
+        return $this->status === $status;
     }
 
-    public function isInProgress(): bool
+    public function hasPriority(string $priority): bool
     {
-        return $this->status === self::STATUS_IN_PROGRESS;
+        return $this->priority === $priority;
     }
 
-    public function isCompleted(): bool
+    public function isOverDue(): bool
     {
-        return $this->status === self::STATUS_COMPLETED;
-    }
-
-    public function isCancelled(): bool
-    {
-        return $this->status === self::STATUS_CANCELLED;
-    }
-
-    public function isLowPriority(): bool
-    {
-        return $this->priority === self::PRIORITY_LOW;
-    }
-
-    public function isMediumPriority(): bool
-    {
-        return $this->priority === self::PRIORITY_MEDIUM;
-    }
-
-    public function isHighPriority(): bool
-    {
-        return $this->priority === self::PRIORITY_HIGH;
+        return $this->due_date !== null && $this->due_date->isPast();
     }
 }
