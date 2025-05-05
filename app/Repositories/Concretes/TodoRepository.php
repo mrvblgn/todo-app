@@ -10,7 +10,7 @@ class TodoRepository implements ITodoRepository
 {
     public function getAll(array $filters): LengthAwarePaginator
     {
-        $query = Todo::query();
+        $query = Todo::with('category');
 
         if (isset($filters['status'])) {
             $query->where('status', $filters['status']);
@@ -29,7 +29,7 @@ class TodoRepository implements ITodoRepository
 
     public function findById(int $id): ?Todo
     {
-        return Todo::find($id);
+        return Todo::with('category')->find($id);
     }
 
     public function create(array $data): Todo
@@ -57,7 +57,7 @@ class TodoRepository implements ITodoRepository
 
     public function search(string $term, array $filters): LengthAwarePaginator
     {
-        $query = Todo::query();
+        $query = Todo::with('category');
 
         $query->where(function ($q) use ($term) {
             $q->where('title', 'like', "%{$term}%")
