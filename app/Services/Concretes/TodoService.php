@@ -50,4 +50,15 @@ class TodoService implements ITodoService
     {
         return $this->todoRepository->search($term, $filters);
     }
+
+    public function getTodosByStatus(): array
+    {
+        return $this->todoRepository->getTodosByStatus();
+    }
+
+    public function getTodosByPriority(): array
+    {
+        return $this->todoRepository->getTodosByPriority();
+    }
+
 }

@@ -111,4 +111,35 @@ class TodoController extends Controller
             'data' => TodoResource::collection($todos),
         ]);
     }
+
+    public function getTodosByStatus(): JsonResponse
+    {
+        $statuses = $this->todoService->getTodosByStatus();
+
+        return response()->json([
+            'status' => 'success',
+            'data' => $statuses->map(function ($status) {
+                return [
+                    'status' => $status->status,  
+                    'count' => $status->count,    
+                ];
+            }),
+        ]);
+    }
+
+    public function getTodosByPriority(): JsonResponse
+    {
+        $priorities = $this->todoService->getTodosByPriority();
+
+        return response()->json([
+            'status' => 'success',
+            'data' => $priorities->map(function ($priority) {
+                return [
+                    'priority' => $priority->priority,  
+                    'count' => $priority->count,        
+                ];
+            }),
+        ]);
+    }
+
 }

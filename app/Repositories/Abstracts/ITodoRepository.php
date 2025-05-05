@@ -14,4 +14,6 @@ interface ITodoRepository
     public function updateStatus(int $id, string $status): bool;
     public function delete(int $id): bool;
     public function search(string $term, array $filters): LengthAwarePaginator;
+    public function getTodosByStatus(): array;
+    public function getTodosByPriority(): array;
 }

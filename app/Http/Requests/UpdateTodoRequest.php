@@ -20,4 +20,13 @@ class UpdateTodoRequest extends FormRequest
             'due_date' => ['nullable', 'date', 'after_or_equal:today'],
         ];
     }
+
+    // XSS koruması için kullanıcıdan gelen verileri temizleme
+    protected function prepareForValidation(): void
+    {
+        $this->merge([
+            'title' => $this->title ? strip_tags($this->title) : null,
+            'description' => $this->description ? strip_tags($this->description) : null,
+        ]);
+    }
 }

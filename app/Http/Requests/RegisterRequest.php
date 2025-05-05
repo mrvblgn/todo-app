@@ -19,4 +19,13 @@ class RegisterRequest extends FormRequest
             'password' => 'required|string|min:6|confirmed'
         ];
     }
+
+    // XSS koruması için kullanıcıdan gelen verileri temizleme
+    protected function prepareForValidation(): void
+    {
+        $this->merge([
+            'name' => $this->name ? strip_tags($this->name) : null,
+            'email' => $this->email ? strip_tags($this->email) : null,
+        ]);
+    }
 } 

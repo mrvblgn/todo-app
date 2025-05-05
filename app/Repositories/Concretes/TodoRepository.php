@@ -78,4 +78,22 @@ class TodoRepository implements ITodoRepository
 
         return $query->orderBy($sort, $order)->paginate($limit);
     }
+
+    public function getTodosByStatus(): array
+    {
+        return Todo::selectRaw('status, COUNT(*) as count')
+            ->groupBy('status')
+            ->get()
+            ->pluck('count', 'status')
+            ->toArray();
+    }
+
+    public function getTodosByPriority(): array
+    {
+        return Todo::selectRaw('priority, COUNT(*) as count')
+            ->groupBy('priority')
+            ->get()
+            ->pluck('count', 'priority')
+            ->toArray();
+    }
 }

@@ -18,4 +18,12 @@ class LoginRequest extends FormRequest
             'password' => 'required|string'
         ];
     }
+
+    // XSS koruması için kullanıcıdan gelen verileri temizleme
+    protected function prepareForValidation(): void
+    {
+        $this->merge([
+            'email' => $this->email ? strip_tags($this->email) : null,
+        ]);
+    }
 } 
