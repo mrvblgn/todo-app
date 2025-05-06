@@ -21,7 +21,7 @@ class User extends Authenticatable implements JWTSubject
         'name',
         'email',
         'password',
-        'is_admin',
+        'role',
     ];
 
     /**
@@ -44,7 +44,6 @@ class User extends Authenticatable implements JWTSubject
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
-            'is_admin' => 'boolean'
         ];
     }
 
@@ -58,7 +57,18 @@ class User extends Authenticatable implements JWTSubject
         return [];
     }
 
-    public function getIsAdminAttribute(): bool
+    /**
+     * Check if user has a specific role
+     */
+    public function hasRole($role): bool
+    {
+        return $this->role === $role;
+    }
+
+    /**
+     * Check if user is admin
+     */
+    public function isAdmin(): bool
     {
         return $this->role === 'admin';
     }

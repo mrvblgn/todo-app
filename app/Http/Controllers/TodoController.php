@@ -10,9 +10,13 @@ use App\Models\Todo;
 use App\Services\Abstracts\ITodoService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use App\Traits\ApiResponse;
 
 class TodoController extends Controller
 {
+    use ApiResponse;
+
     protected ITodoService $todoService;
 
     public function __construct(ITodoService $todoService)
@@ -41,105 +45,110 @@ class TodoController extends Controller
         ]);
     }
 
-    public function findById(int $id): JsonResponse
-    {
-        $todo = $this->todoService->findById($id);
-
-        if (!$todo) {
-            return response()->json(['message' => 'Todo bulunamadı'], 404);
-        }
-
-        return response()->json(new TodoResource($todo));
-    }
-
-    public function create(CreateTodoRequest $request): JsonResponse
-    {
-        $validated = $request->validated();
-        $todo = $this->todoService->create($validated);
-
-        return response()->json(new TodoResource($todo), 201);
-    }
-
-    public function update(UpdateTodoRequest $request, int $id): JsonResponse
-    {
-        $validated = $request->validated();
-        $updatedTodo = $this->todoService->update($id, $validated);
-
-        if (!$updatedTodo) {
-            return response()->json(['message' => 'Todo bulunamadı'], 404);
-        }
-
-        return response()->json(new TodoResource($updatedTodo));
-    }
-
-    public function updateStatus(Request $request, int $id): JsonResponse
-    {
-        $status = $request->input('status');
-
-        if (!in_array($status, ['pending', 'completed', 'overdue'])) {
-            return response()->json(['message' => 'Geçersiz status'], 400);
-        }
-
-        $updatedTodo = $this->todoService->updateStatus($id, $status);
-
-        if (!$updatedTodo) {
-            return response()->json(['message' => 'Todo bulunamadı'], 404);
-        }
-
-        return response()->json(new TodoResource($updatedTodo));
-    }
-
-    public function delete(int $id): JsonResponse
-    {
-        $deleted = $this->todoService->delete($id);
-
-        if (!$deleted) {
-            return response()->json(['message' => 'Todo bulunamadı'], 404);
-        }
-
-        return response()->json(['message' => 'Todo başarıyla silindi'], 204);
-    }
-
+    /**
+     * Todo ara
+     */
     public function search(Request $request): JsonResponse
     {
-        $term = $request->input('q');
-        $filters = $request->only(['status', 'priority', 'sort', 'order', 'limit']);
-        $todos = $this->todoService->search($term, $filters);
+        $query = $request->get('q');
+        if (empty($query)) {
+            return $this->errorResponse('Arama terimi gerekli', 400);
+        }
 
-        return response()->json([
-            'status' => 'success',
-            'data' => TodoResource::collection($todos),
-        ]);
+        $todos = $this->todoService->search($query);
+        return $this->successResponse(TodoResource::collection($todos));
     }
 
+    /**
+     * Belirli bir todo'yu getir
+     */
+    public function show(int $id): JsonResponse
+    {
+        $todo = $this->todoService->findById($id);
+        if (!$todo) {
+            return $this->errorResponse('Todo bulunamadı', 404);
+        }
+
+        $this->authorize('view', $todo);
+        return $this->successResponse(new TodoResource($todo));
+    }
+
+    /**
+     * Yeni todo oluştur
+     */
+    public function store(CreateTodoRequest $request): JsonResponse
+    {
+        $this->authorize('create', Todo::class);
+        $validated = $request->validated();
+        $todo = $this->todoService->create($validated);
+        return $this->successResponse(new TodoResource($todo), 'Todo başarıyla oluşturuldu', 201);
+    }
+
+    /**
+     * Todo güncelle
+     */
+    public function update(UpdateTodoRequest $request, int $id): JsonResponse
+    {
+        $todo = $this->todoService->findById($id);
+        if (!$todo) {
+            return $this->errorResponse('Todo bulunamadı', 404);
+        }
+
+        $this->authorize('update', $todo);
+        $validated = $request->validated();
+        $updatedTodo = $this->todoService->update($id, $validated);
+        return $this->successResponse(new TodoResource($updatedTodo), 'Todo başarıyla güncellendi');
+    }
+
+    /**
+     * Sadece todo durumunu güncelle
+     */
+    public function updateStatus(Request $request, int $id): JsonResponse
+    {
+        $todo = $this->todoService->findById($id);
+        if (!$todo) {
+            return $this->errorResponse('Todo bulunamadı', 404);
+        }
+
+        $this->authorize('update', $todo);
+        $validated = $request->validate([
+            'status' => 'required|in:pending,in_progress,completed'
+        ]);
+
+        $updatedTodo = $this->todoService->updateStatus($id, $validated['status']);
+        return $this->successResponse(new TodoResource($updatedTodo), 'Todo durumu başarıyla güncellendi');
+    }
+
+    /**
+     * Todo sil (soft delete)
+     */
+    public function destroy(int $id): JsonResponse
+    {
+        $todo = $this->todoService->findById($id);
+        if (!$todo) {
+            return $this->errorResponse('Todo bulunamadı', 404);
+        }
+
+        $this->authorize('delete', $todo);
+        $this->todoService->delete($id);
+        return $this->successResponse(null, 'Todo başarıyla silindi');
+    }
+
+    /**
+     * Durumlara göre todo sayılarını getir
+     */
     public function getTodosByStatus(): JsonResponse
     {
         $statuses = $this->todoService->getTodosByStatus();
-
-        return response()->json([
-            'status' => 'success',
-            'data' => $statuses->map(function ($status) {
-                return [
-                    'status' => $status->status,  
-                    'count' => $status->count,    
-                ];
-            }),
-        ]);
+        return $this->successResponse($statuses);
     }
 
+    /**
+     * Önceliklere göre todo sayılarını getir
+     */
     public function getTodosByPriority(): JsonResponse
     {
         $priorities = $this->todoService->getTodosByPriority();
-
-        return response()->json([
-            'status' => 'success',
-            'data' => $priorities->map(function ($priority) {
-                return [
-                    'priority' => $priority->priority,  
-                    'count' => $priority->count,        
-                ];
-            }),
-        ]);
+        return $this->successResponse($priorities);
     }
-
 }
