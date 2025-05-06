@@ -5,12 +5,13 @@ namespace App\Repositories\Concretes;
 use App\Models\Todo;
 use Illuminate\Pagination\LengthAwarePaginator;
 use App\Repositories\Abstracts\ITodoRepository;
+use Illuminate\Database\Eloquent\Collection;
 
 class TodoRepository implements ITodoRepository
 {
     public function getAll(array $filters): LengthAwarePaginator
     {
-        $query = Todo::with('category');
+        $query = Todo::with('categories');
 
         if (isset($filters['status'])) {
             $query->where('status', $filters['status']);
@@ -55,28 +56,12 @@ class TodoRepository implements ITodoRepository
         return $todo ? $todo->delete() : false;
     }
 
-    public function search(string $term, array $filters): LengthAwarePaginator
+    public function search(string $query): Collection
     {
-        $query = Todo::with('category');
-
-        $query->where(function ($q) use ($term) {
-            $q->where('title', 'like', "%{$term}%")
-              ->orWhere('description', 'like', "%{$term}%");
-        });
-
-        if (isset($filters['status'])) {
-            $query->where('status', $filters['status']);
-        }
-
-        if (isset($filters['priority'])) {
-            $query->where('priority', $filters['priority']);
-        }
-
-        $sort = $filters['sort'] ?? 'created_at';
-        $order = $filters['order'] ?? 'desc';
-        $limit = min($filters['limit'] ?? 10, 50);
-
-        return $query->orderBy($sort, $order)->paginate($limit);
+        return Todo::where(function($q) use ($query) {
+            $q->where('title', 'like', "%{$query}%")
+              ->orWhere('description', 'like', "%{$query}%");
+        })->get();
     }
 
     public function getTodosByStatus(): array

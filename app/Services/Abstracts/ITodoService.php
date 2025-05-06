@@ -4,6 +4,7 @@ namespace App\Services\Abstracts;
 
 use App\Models\Todo;
 use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Database\Eloquent\Collection;
 
 interface ITodoService
 {
@@ -19,7 +20,7 @@ interface ITodoService
 
     public function delete(int $id): bool;
 
-    public function search(string $term, array $filters): LengthAwarePaginator;
+    public function search(string $query): Collection;
 
     public function getTodosByStatus(): array;
 

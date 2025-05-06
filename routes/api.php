@@ -17,12 +17,18 @@ Route::middleware(['auth:api'])->group(function () {
     Route::post('/auth/logout', [AuthController::class, 'logout']);
     Route::post('/auth/refresh', [AuthController::class, 'refresh']);
 
-    // Todo routes
-    Route::get('/todos', [TodoController::class, 'index']);
+    // Normal user routes - Can only manage their own todos
+    Route::get('/todos', [TodoController::class, 'getAll']);
     Route::get('/todos/search', [TodoController::class, 'search']);
-    Route::get('/todos/{id}', [TodoController::class, 'show']);
-    Route::post('/todos', [TodoController::class, 'store']);
+    Route::get('/todos/{id}', [TodoController::class, 'findById']);
+    Route::post('/todos', [TodoController::class, 'create']);
     Route::put('/todos/{id}', [TodoController::class, 'update']);
     Route::patch('/todos/{id}/status', [TodoController::class, 'updateStatus']);
-    Route::delete('/todos/{id}', [TodoController::class, 'destroy']);
+    Route::delete('/todos/{id}', [TodoController::class, 'delete']);
+
+    // Admin routes - Can manage all todos
+    Route::middleware(['admin'])->prefix('admin')->group(function () {
+        Route::get('/todos', [TodoController::class, 'getAll']); // Tüm todo'ları listeler
+        Route::get('/todos/search', [TodoController::class, 'search']); // Tüm todo'larda arama yapar
+    });
 });

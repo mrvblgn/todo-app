@@ -15,8 +15,11 @@ class AdminMiddleware
      */
     public function handle(Request $request, Closure $next): Response
     {
-        if (!auth()->check() || !auth()->user()->is_admin) {
-            return response()->json(['message' => 'Bu işlem için yetkiniz yok.'], 403);
+        if (!$request->user() || $request->user()->role !== 'admin') {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Bu işlem için admin yetkisi gerekiyor'
+            ], 403);
         }
 
         return $next($request);

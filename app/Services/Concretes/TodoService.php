@@ -4,8 +4,9 @@ namespace App\Services\Concretes;
 
 use App\Models\Todo;
 use Illuminate\Pagination\LengthAwarePaginator;
-use App\Repositories\Contracts\ITodoRepository;
-use App\Services\Contracts\ITodoService;
+use App\Repositories\Abstracts\ITodoRepository;
+use App\Services\Abstracts\ITodoService;
+use Illuminate\Database\Eloquent\Collection;
 
 class TodoService implements ITodoService
 {
@@ -46,9 +47,9 @@ class TodoService implements ITodoService
         return $this->todoRepository->delete($id);
     }
 
-    public function search(string $term, array $filters): LengthAwarePaginator
+    public function search(string $query): Collection
     {
-        return $this->todoRepository->search($term, $filters);
+        return $this->todoRepository->search($query);
     }
 
     public function getTodosByStatus(): array

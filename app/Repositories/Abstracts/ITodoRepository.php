@@ -2,8 +2,9 @@
 
 namespace App\Repositories\Abstracts;
 
-use Illuminate\Pagination\LengthAwarePaginator;
 use App\Models\Todo;
+use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Database\Eloquent\Collection;
 
 interface ITodoRepository
 {
@@ -13,7 +14,7 @@ interface ITodoRepository
     public function update(int $id, array $data): bool;
     public function updateStatus(int $id, string $status): bool;
     public function delete(int $id): bool;
-    public function search(string $term, array $filters): LengthAwarePaginator;
+    public function search(string $query): Collection;
     public function getTodosByStatus(): array;
     public function getTodosByPriority(): array;
 }
