@@ -12,5 +12,5 @@ interface ICategoryRepository
     public function create(array $daya): Category;
     public function update(int $id, array $data): bool;
     public function delete(int $id): bool;
-    public function getTodosByCategoryId(int $id): Collection;
+    public function getTodosByCategory(int $id): Collection;
 }

@@ -32,12 +32,12 @@ class TodoService implements ITodoService
         return $this->todoRepository->create($data);
     }
 
-    public function update(int $id, array $data): bool
+    public function update(int $id, array $data): ?Todo
     {
         return $this->todoRepository->update($id, $data);
     }
 
-    public function updateStatus(int $id, string $status): bool
+    public function updateStatus(int $id, string $status): ?Todo
     {
         return $this->todoRepository->updateStatus($id, $status);
     }

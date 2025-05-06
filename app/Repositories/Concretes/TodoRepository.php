@@ -30,7 +30,7 @@ class TodoRepository implements ITodoRepository
 
     public function findById(int $id): ?Todo
     {
-        return Todo::with('category')->find($id);
+        return Todo::with('categories')->find($id);
     }
 
     public function create(array $data): Todo
@@ -38,16 +38,24 @@ class TodoRepository implements ITodoRepository
         return Todo::create($data);
     }
 
-    public function update(int $id, array $data): bool
+    public function update(int $id, array $data): ?Todo
     {
         $todo = $this->findById($id);
-        return $todo ? $todo->update($data) : false;
+        if ($todo) {
+            $todo->update($data);
+            return $todo->fresh(); // Güncellenmiş modeli döndür
+        }
+        return null;
     }
 
-    public function updateStatus(int $id, string $status): bool
+    public function updateStatus(int $id, string $status): ?Todo
     {
         $todo = $this->findById($id);
-        return $todo ? $todo->update(['status' => $status]) : false;
+        if ($todo) {
+            $todo->update(['status' => $status]);
+            return $todo->fresh();
+        }
+        return null;
     }
 
     public function delete(int $id): bool

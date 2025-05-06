@@ -14,9 +14,9 @@ interface ITodoService
 
     public function create(array $data): Todo;
 
-    public function update(int $id, array $data): bool;
+    public function update(int $id, array $data): ?Todo;
 
-    public function updateStatus(int $id, string $status): bool;
+    public function updateStatus(int $id, string $status): ?Todo;
 
     public function delete(int $id): bool;
 

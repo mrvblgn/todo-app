@@ -45,7 +45,7 @@ class CategoryRepository implements ICategoryRepository
         return false;
     }
 
-    public function getTodosByCategoryId(int $id): Collection
+    public function getTodosByCategory(int $id): Collection
     {
         $category = $this->findById($id);
 

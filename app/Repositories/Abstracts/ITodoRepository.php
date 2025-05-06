@@ -11,8 +11,8 @@ interface ITodoRepository
     public function getAll(array $filters): LengthAwarePaginator;
     public function findById(int $id): ?Todo;
     public function create(array $data): Todo;
-    public function update(int $id, array $data): bool;
-    public function updateStatus(int $id, string $status): bool;
+    public function update(int $id, array $data): ?Todo;
+    public function updateStatus(int $id, string $status): ?Todo;
     public function delete(int $id): bool;
     public function search(string $query): Collection;
     public function getTodosByStatus(): array;

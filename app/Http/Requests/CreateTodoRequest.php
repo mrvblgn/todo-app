@@ -18,6 +18,8 @@ class CreateTodoRequest extends FormRequest
             'description' => ['nullable', 'string'],
             'priority' => ['required', 'in:low,medium,high'],
             'due_date' => ['nullable', 'date', 'after_or_equal:today'],
+            'categories' => ['nullable', 'array'],
+            'categories.*' => ['integer', 'exists:categories,id'],
         ];
     }
 

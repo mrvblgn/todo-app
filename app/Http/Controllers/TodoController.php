@@ -10,9 +10,12 @@ use App\Models\Todo;
 use App\Services\Abstracts\ITodoService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 
 class TodoController extends Controller
 {
+    use AuthorizesRequests;
+    
     protected ITodoService $todoService;
 
     public function __construct(ITodoService $todoService)
@@ -63,7 +66,16 @@ class TodoController extends Controller
         $validated = $request->validated();
         $validated['user_id'] = auth()->id();
         
+        // Kategorileri al ve validasyondan çıkar
+        $categoryIds = $validated['categories'] ?? [];
+        unset($validated['categories']);
+
         $todo = $this->todoService->create($validated);
+
+        // Kategorileri ilişkilendir
+        if (!empty($categoryIds)) {
+            $todo->categories()->sync($categoryIds);
+        }
 
         return response()->json([
             'status' => 'success',
@@ -164,12 +176,12 @@ class TodoController extends Controller
 
         return response()->json([
             'status' => 'success',
-            'data' => $statuses->map(function ($status) {
+            'data' => collect($statuses)->map(function ($count, $status) {
                 return [
-                    'status' => $status->status,  
-                    'count' => $status->count,    
+                    'status' => $status,
+                    'count' => $count,
                 ];
-            })
+            })->values()
         ]);
     }
 
@@ -179,12 +191,12 @@ class TodoController extends Controller
 
         return response()->json([
             'status' => 'success',
-            'data' => $priorities->map(function ($priority) {
+            'data' => collect($priorities)->map(function ($count, $priorities) {
                 return [
-                    'priority' => $priority->priority,  
-                    'count' => $priority->count,        
+                    'priorities' => $priorities,
+                    'count' => $count,
                 ];
-            })
+            })->values()
         ]);
     }
 }

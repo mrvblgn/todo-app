@@ -3,10 +3,11 @@
 namespace App\Services\Abstracts;
 
 use App\Models\Category;
+use Illuminate\Database\Eloquent\Collection;
 
 interface ICategoryService
 {
-    public function getAll(): array;
+    public function getAll(): Collection;
 
     public function getById(int $id): ?Category;
 
@@ -16,5 +17,5 @@ interface ICategoryService
 
     public function delete(int $id): bool;
 
-    public function getTodosByCategory(int $id): array;
+    public function getTodosByCategory(int $id): Collection;
 }

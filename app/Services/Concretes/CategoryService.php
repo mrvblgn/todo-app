@@ -5,6 +5,7 @@ namespace App\Services\Concretes;
 use App\Models\Category;
 use App\Repositories\Abstracts\ICategoryRepository;
 use App\Services\Abstracts\ICategoryService;
+use Illuminate\Database\Eloquent\Collection;
 
 class CategoryService implements ICategoryService
 {
@@ -15,7 +16,7 @@ class CategoryService implements ICategoryService
         $this->categoryRepository = $categoryRepository;
     }
 
-    public function getAll(): array
+    public function getAll(): Collection
     {
         return $this->categoryRepository->getAll();
     }
@@ -40,7 +41,7 @@ class CategoryService implements ICategoryService
         return $this->categoryRepository->delete($id);
     }
 
-    public function getTodosByCategory(int $id): array
+    public function getTodosByCategory(int $id): Collection
     {
         return $this->categoryRepository->getTodosByCategory($id);
     }
