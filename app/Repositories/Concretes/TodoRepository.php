@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Repositories;
+namespace App\Repositories\Concretes;
 
 use App\Models\Todo;
 use Illuminate\Pagination\LengthAwarePaginator;
-use App\Repositories\Contracts\ITodoRepository;
+use App\Repositories\Abstracts\ITodoRepository;
 
 class TodoRepository implements ITodoRepository
 {
@@ -84,7 +84,9 @@ class TodoRepository implements ITodoRepository
         return Todo::selectRaw('status, COUNT(*) as count')
             ->groupBy('status')
             ->get()
-            ->pluck('count', 'status')
+            ->mapWithKeys(function ($item) {
+                return [$item->status => $item->count];
+            })
             ->toArray();
     }
 
@@ -93,7 +95,9 @@ class TodoRepository implements ITodoRepository
         return Todo::selectRaw('priority, COUNT(*) as count')
             ->groupBy('priority')
             ->get()
-            ->pluck('count', 'priority')
+            ->mapWithKeys(function ($item) {
+                return [$item->priority => $item->count];
+            })
             ->toArray();
     }
 }

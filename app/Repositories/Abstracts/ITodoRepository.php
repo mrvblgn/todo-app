@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Repositories\Contracts;
+namespace App\Repositories\Abstracts;
 
 use Illuminate\Pagination\LengthAwarePaginator;
 use App\Models\Todo;

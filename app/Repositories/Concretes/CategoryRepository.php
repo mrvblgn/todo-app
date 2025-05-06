@@ -1,0 +1,58 @@
+<?php
+
+namespace App\Repositories\Concretes;
+
+use App\Models\Category;
+use App\Repositories\Abstracts\ICategoryRepository;
+use Illuminate\Database\Eloquent\Collection;
+
+class CategoryRepository implements ICategoryRepository
+{
+    public function getAll(): Collection
+    {
+        return Category::all();
+    }
+
+    public function findById(int $id): ?Category
+    {
+        return Category::find($id);
+    }
+
+    public function create(array $data): Category
+    {
+        return Category::create($data);
+    }
+
+    public function update(int $id, array $data): bool
+    {
+        $category = $this->findById($id);
+
+        if ($category) {
+            return $category->update($data);
+        }
+
+        return false;
+    }
+
+    public function delete(int $id): bool
+    {
+        $category = $this->findById($id);
+
+        if ($category) {
+            return $category->delete();
+        }
+
+        return false;
+    }
+
+    public function getTodosByCategoryId(int $id): Collection
+    {
+        $category = $this->findById($id);
+
+        if ($category) {
+            return $category->todos;
+        }
+
+        return collect();  // Eğer kategori bulunmazsa boş koleksiyon döndür
+    }
+}
