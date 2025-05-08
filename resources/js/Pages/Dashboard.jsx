@@ -1,26 +1,54 @@
-import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
-import { Head } from '@inertiajs/react';
+import React, { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 
 export default function Dashboard() {
-    return (
-        <AuthenticatedLayout
-            header={
-                <h2 className="text-xl font-semibold leading-tight text-gray-800">
-                    Dashboard
-                </h2>
-            }
-        >
-            <Head title="Dashboard" />
+    const [todos, setTodos] = useState([]);
+    const [loading, setLoading] = useState(true);
 
-            <div className="py-12">
-                <div className="mx-auto max-w-7xl sm:px-6 lg:px-8">
-                    <div className="overflow-hidden bg-white shadow-sm sm:rounded-lg">
-                        <div className="p-6 text-gray-900">
-                            You're logged in!
+    useEffect(() => {
+        // Axios ile API isteği örneği
+        window.axios.get('/api/todos')
+            .then(response => {
+                setTodos(response.data);
+                setLoading(false);
+            })
+            .catch(error => {
+                console.error('Error fetching todos:', error);
+                setLoading(false);
+            });
+    }, []);
+
+    return (
+        <div className="min-h-screen p-8">
+            <div className="max-w-7xl mx-auto">
+                <h1 className="text-3xl font-bold mb-6">Dashboard</h1>
+                <div className="bg-white rounded-lg shadow p-6">
+                    {loading ? (
+                        <p>Loading...</p>
+                    ) : (
+                        <div>
+                            <h2 className="text-xl font-semibold mb-4">Your Todos</h2>
+                            {todos.length > 0 ? (
+                                <ul className="space-y-2">
+                                    {todos.map(todo => (
+                                        <li key={todo.id} className="p-2 bg-gray-50 rounded">
+                                            {todo.title}
+                                        </li>
+                                    ))}
+                                </ul>
+                            ) : (
+                                <p className="text-gray-600">No todos found.</p>
+                            )}
                         </div>
-                    </div>
+                    )}
+                    <Link 
+                        to="/" 
+                        className="inline-block mt-4 text-blue-500 hover:text-blue-700"
+                    >
+                        Back to Home
+                    </Link>
                 </div>
             </div>
-        </AuthenticatedLayout>
+        </div>
     );
 }
