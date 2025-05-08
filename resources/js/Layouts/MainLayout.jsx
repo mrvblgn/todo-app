@@ -1,16 +1,23 @@
 import React, { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
+import useAuth from "@/hooks/useAuth";
 
-const navigation = [
+const leftNavigation = [
     { name: 'Dashboard', href: '/dashboard' },
     { name: 'Todos', href: '/todos' },
     { name: 'Categories', href: '/categories' },
+];
+
+const rightNavigation = [
+    { name: 'Login', href: '/login' },
+    { name: 'Register', href: '/register' },
 ];
 
 const MainLayout = ({ children }) => {
     const [isDarkMode, setIsDarkMode] = useState(false);
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
     const location = useLocation();
+    const { token, logout } = useAuth();
 
     const toggleTheme = () => {
         setIsDarkMode(!isDarkMode);
@@ -22,16 +29,13 @@ const MainLayout = ({ children }) => {
             {/* Navigation */}
             <nav className="bg-white dark:bg-gray-800 shadow">
                 <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-                    <div className="flex h-16 justify-between">
-                        <div className="flex">
-                            <div className="flex flex-shrink-0 items-center">
-                                <Link to="/" className="text-xl font-bold text-gray-900 dark:text-white">
-                                    Todo App
-                                </Link>
-                            </div>
-                            {/* Desktop Navigation */}
-                            <div className="hidden sm:ml-6 sm:flex sm:space-x-8">
-                                {navigation.map((item) => (
+                    <div className="flex h-16 justify-between items-center">
+                        <div className="flex items-center">
+                            <Link to="/" className="text-xl font-bold text-gray-900 dark:text-white mr-8">
+                                Todo App
+                            </Link>
+                            <div className="hidden sm:flex sm:space-x-8">
+                                {leftNavigation.map((item) => (
                                     <Link
                                         key={item.name}
                                         to={item.href}
@@ -46,8 +50,33 @@ const MainLayout = ({ children }) => {
                                 ))}
                             </div>
                         </div>
-                        <div className="flex items-center">
-                            {/* Theme Toggle Button */}
+                        <div className="flex items-center space-x-4">
+                            <div className="hidden sm:flex sm:space-x-4">
+                                {rightNavigation.map((item) => (
+                                    <Link
+                                        key={item.name}
+                                        to={item.href}
+                                        className={`inline-flex items-center px-3 py-1 text-sm font-medium rounded ${
+                                            location.pathname === item.href
+                                                ? 'bg-indigo-500 text-white'
+                                                : 'text-gray-500 hover:bg-gray-100 hover:text-gray-700 dark:text-gray-300 dark:hover:bg-gray-700 dark:hover:text-white'
+                                        }`}
+                                    >
+                                        {item.name}
+                                    </Link>
+                                ))}
+                            </div>
+                            {token && (
+                                <button
+                                    onClick={async () => {
+                                        await logout();
+                                        window.location.href = "/login";
+                                    }}
+                                    className="btn btn-secondary"
+                                >
+                                    Logout
+                                </button>
+                            )}
                             <button
                                 onClick={toggleTheme}
                                 className="p-2 rounded-md text-gray-500 hover:text-gray-700 dark:text-gray-300 dark:hover:text-white"
@@ -69,7 +98,7 @@ const MainLayout = ({ children }) => {
                 {isMobileMenuOpen && (
                     <div className="sm:hidden">
                         <div className="space-y-1 pb-3 pt-2">
-                            {navigation.map((item) => (
+                            {[...leftNavigation, ...rightNavigation].map((item) => (
                                 <Link
                                     key={item.name}
                                     to={item.href}
