@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 
-export default function Dashboard() {
+const Dashboard = () => {
     const [todos, setTodos] = useState([]);
     const [loading, setLoading] = useState(true);
 
@@ -51,4 +51,6 @@ export default function Dashboard() {
             </div>
         </div>
     );
-}
+};
+
+export default Dashboard;

@@ -12,7 +12,8 @@
         <link href="https://fonts.bunny.net/css?family=figtree:400,500,600&display=swap" rel="stylesheet" />
 
         <!-- Scripts -->
-        @vite(['resources/js/index.jsx'])
+        @viteReactRefresh
+        @vite(['resources/css/app.css', 'resources/js/index.jsx'])
     </head>
     <body class="font-sans antialiased">
         <div id="root"></div>

@@ -3,23 +3,18 @@ import './bootstrap';
 import React from 'react';
 import { Routes, Route } from 'react-router-dom';
 import MainLayout from './layouts/MainLayout';
-import Welcome from './Pages/Welcome';
-import Dashboard from './Pages/Dashboard';
-import TodoList from './Pages/TodoList';
-import TodoForm from './Pages/TodoForm';
-import CategoryList from './Pages/CategoryList';
+import Welcome from './pages/Welcome';
+import Dashboard from './pages/Dashboard';
 
-export default function App() {
+const App = () => {
     return (
         <MainLayout>
             <Routes>
                 <Route path="/" element={<Welcome />} />
                 <Route path="/dashboard" element={<Dashboard />} />
-                <Route path="/todos" element={<TodoList />} />
-                <Route path="/todos/create" element={<TodoForm />} />
-                <Route path="/todos/:id/edit" element={<TodoForm />} />
-                <Route path="/categories" element={<CategoryList />} />
             </Routes>
         </MainLayout>
     );
-}
+};
+
+export default App;

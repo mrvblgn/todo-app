@@ -1,7 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 
-export default function Welcome() {
+const Welcome = () => {
     return (
         <div className="min-h-screen flex flex-col items-center justify-center">
             <h1 className="text-4xl font-bold mb-4">Welcome to Todo App</h1>
@@ -13,4 +13,6 @@ export default function Welcome() {
             </Link>
         </div>
     );
-} 
+};
+
+export default Welcome; 
