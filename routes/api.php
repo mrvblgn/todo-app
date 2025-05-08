@@ -5,12 +5,14 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\TodoController;
 use App\Http\Controllers\CategoryController;
 
-
 // Auth routes with stricter rate limiting
 Route::middleware(['throttle:30,1'])->group(function () {
     Route::post('/auth/register', [AuthController::class, 'register']);
     Route::post('/auth/login', [AuthController::class, 'login']);
 });
+
+Route::get('/categories', [CategoryController::class, 'getAll']);
+Route::get('/categories/{id}', [CategoryController::class, 'getById']);
 
 // Protected routes
 Route::middleware(['auth:api'])->group(function () {
@@ -36,8 +38,6 @@ Route::middleware(['auth:api'])->group(function () {
     });
 
     // Category routes
-    Route::get('/categories', [CategoryController::class, 'getAll']);
-    Route::get('/categories/{id}', [CategoryController::class, 'getById']);
     Route::get('/categories/{id}/todos', [CategoryController::class, 'getTodosByCategory']);
     Route::post('/categories', [CategoryController::class, 'create']);
     Route::put('/categories/{id}', [CategoryController::class, 'update']);
