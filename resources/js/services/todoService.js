@@ -60,9 +60,9 @@ export const deleteTodo = async (id) => {
     }
 };
 
-export const searchTodos = async (query) => {
+export const searchTodos = async (query, page = 1) => {
     try {
-        const response = await api.get("/todos/search", { params: { q: query } });
+        const response = await api.get("/todos/search", { params: { q: query, page } });
         return response.data;
     } catch (error) {
         console.error("Error searching todos:", error);

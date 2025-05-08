@@ -9,6 +9,7 @@ import Login from './pages/Login';
 import Register from './pages/Register';
 import CategoryPage from './pages/CategoryPage';
 import TodoPage from './pages/TodoPage';
+import CreateTodoPage from './pages/CreateTodoPage';
 
 const App = () => {
     return (
@@ -20,6 +21,7 @@ const App = () => {
                 <Route path="/register" element={<Register />} />
                 <Route path="/categories" element={<CategoryPage />} />
                 <Route path="/todos" element={<TodoPage />} />
+                <Route path="/create-todo" element={<CreateTodoPage />} />
             </Routes>
         </MainLayout>
     );

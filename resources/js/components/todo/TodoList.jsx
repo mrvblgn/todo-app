@@ -1,10 +1,12 @@
 import React, { useEffect, useState } from "react";
 import { getAllTodos, searchTodos } from "@/services/todoService";
+import Pagination from "@/components/common/Pagination";
 
-const TodoList = ({ filters = {} }) => {
+const TodoList = ({ filters = {}, page = 1, onPageChange }) => {
   const [todos, setTodos] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [meta, setMeta] = useState(null);
 
   useEffect(() => {
     const fetchTodos = async () => {
@@ -12,12 +14,13 @@ const TodoList = ({ filters = {} }) => {
       try {
         let response;
         if (filters.search && filters.search.trim() !== "") {
-          response = await searchTodos(filters.search);
+          response = await searchTodos(filters.search, page);
         } else {
-          response = await getAllTodos(filters);
+          response = await getAllTodos({ ...filters, page });
         }
         if (response.status === 'success') {
           setTodos(response.data);
+          setMeta(response.meta?.pagination || null);
         } else {
           setError('Failed to fetch todos');
         }
@@ -30,7 +33,7 @@ const TodoList = ({ filters = {} }) => {
     };
 
     fetchTodos();
-  }, [filters]);
+  }, [filters, page]);
 
   if (loading) return <div className="text-center py-4">Loading...</div>;
   if (error) return <div className="text-red-500 text-center py-4">{error}</div>;
@@ -38,7 +41,7 @@ const TodoList = ({ filters = {} }) => {
 
   return (
     <div>
-      <h2 className="text-xl font-bold mb-4">Your Todos</h2>
+      <h2 className="text-xl font-bold mb-4">Yapılacaklar Listen</h2>
       <ul className="space-y-2">
         {todos.map(todo => (
           <li key={todo.id} className="p-3 bg-gray-50 rounded-lg">
@@ -58,6 +61,13 @@ const TodoList = ({ filters = {} }) => {
           </li>
         ))}
       </ul>
+      {meta && onPageChange && (
+        <Pagination
+          currentPage={meta.current_page}
+          totalPages={meta.last_page}
+          onPageChange={onPageChange}
+        />
+      )}
     </div>
   );
 };
