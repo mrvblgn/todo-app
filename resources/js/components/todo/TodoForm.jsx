@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { createTodo } from "@/services/todoService";
 import { getAllCategories } from "@/services/categoryService";
 import CategorySelector from "@/components/category/CategorySelector";
+import { validators, validateForm } from "@/utils/validators";
 
 const priorities = [
   { value: "low", label: "Low" },
@@ -9,17 +10,27 @@ const priorities = [
   { value: "high", label: "High" },
 ];
 
-const TodoForm = ({ onTodoCreated }) => {
-  const [title, setTitle] = useState("");
-  const [description, setDescription] = useState("");
-  const [priority, setPriority] = useState("medium");
-  const [dueDate, setDueDate] = useState("");
+const todoRules = {
+  title: [validators.required, validators.todoTitle],
+  description: [validators.todoDescription],
+  dueDate: [validators.dueDate],
+  priority: [validators.required],
+  categories: [validators.required]
+};
+
+const TodoForm = ({ onTodoCreated, initialData, onSuccess, onCancel }) => {
+  const [formData, setFormData] = useState({
+    title: initialData?.title || "",
+    description: initialData?.description || "",
+    priority: initialData?.priority || "medium",
+    dueDate: initialData?.due_date || "",
+    categories: initialData?.categories || []
+  });
   const [categories, setCategories] = useState([]);
-  const [selectedCategories, setSelectedCategories] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [errors, setErrors] = useState({});
 
   useEffect(() => {
-    // Kategorileri çek
     const fetchCategories = async () => {
       const res = await getAllCategories();
       if (res.status === "success") setCategories(res.data);
@@ -27,27 +38,58 @@ const TodoForm = ({ onTodoCreated }) => {
     fetchCategories();
   }, []);
 
+  const handleChange = (field, value) => {
+    setFormData(prev => ({
+      ...prev,
+      [field]: value
+    }));
+    // Clear error when field is modified
+    if (errors[field]) {
+      setErrors(prev => ({
+        ...prev,
+        [field]: ""
+      }));
+    }
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
+    
+    // Validate form
+    const validationErrors = validateForm(formData, todoRules);
+    if (Object.keys(validationErrors).length > 0) {
+      setErrors(validationErrors);
+      return;
+    }
+
     setLoading(true);
     try {
       const todoData = {
-        title,
-        description,
-        priority,
-        due_date: dueDate,
-        categories: selectedCategories,
+        title: formData.title,
+        description: formData.description,
+        priority: formData.priority,
+        due_date: formData.dueDate,
+        categories: formData.categories,
       };
+
       const res = await createTodo(todoData);
       if (onTodoCreated) onTodoCreated(res.data);
-      // Formu temizle
-      setTitle("");
-      setDescription("");
-      setPriority("medium");
-      setDueDate("");
-      setSelectedCategories([]);
+      if (onSuccess) onSuccess(res.data);
+      
+      // Reset form if not editing
+      if (!initialData) {
+        setFormData({
+          title: "",
+          description: "",
+          priority: "medium",
+          dueDate: "",
+          categories: []
+        });
+      }
     } catch (err) {
-      alert("Todo oluşturulamadı!");
+      setErrors({
+        submit: "Failed to create todo. Please try again."
+      });
     } finally {
       setLoading(false);
     }
@@ -57,35 +99,81 @@ const TodoForm = ({ onTodoCreated }) => {
     <form onSubmit={handleSubmit} className="space-y-4">
       <div>
         <label className="block font-medium">Title</label>
-        <input className="input" value={title} onChange={e => setTitle(e.target.value)} required />
+        <input 
+          className={`input ${errors.title ? 'border-red-500' : ''}`}
+          value={formData.title}
+          onChange={e => handleChange('title', e.target.value)}
+        />
+        {errors.title && <p className="text-red-500 text-sm mt-1">{errors.title}</p>}
       </div>
+
       <div>
         <label className="block font-medium">Description</label>
-        <textarea className="input" value={description} onChange={e => setDescription(e.target.value)} />
+        <textarea 
+          className={`input ${errors.description ? 'border-red-500' : ''}`}
+          value={formData.description}
+          onChange={e => handleChange('description', e.target.value)}
+        />
+        {errors.description && <p className="text-red-500 text-sm mt-1">{errors.description}</p>}
       </div>
+
       <div>
         <label className="block font-medium">Priority</label>
-        <select className="input" value={priority} onChange={e => setPriority(e.target.value)}>
+        <select 
+          className={`input ${errors.priority ? 'border-red-500' : ''}`}
+          value={formData.priority}
+          onChange={e => handleChange('priority', e.target.value)}
+        >
           {priorities.map(opt => (
             <option key={opt.value} value={opt.value}>{opt.label}</option>
           ))}
         </select>
+        {errors.priority && <p className="text-red-500 text-sm mt-1">{errors.priority}</p>}
       </div>
+
       <div>
         <label className="block font-medium">Due Date</label>
-        <input className="input" type="date" value={dueDate} onChange={e => setDueDate(e.target.value)} />
+        <input 
+          className={`input ${errors.dueDate ? 'border-red-500' : ''}`}
+          type="date"
+          value={formData.dueDate}
+          onChange={e => handleChange('dueDate', e.target.value)}
+        />
+        {errors.dueDate && <p className="text-red-500 text-sm mt-1">{errors.dueDate}</p>}
       </div>
+
       <div>
         <label className="block font-medium">Categories</label>
         <CategorySelector
           categories={categories}
-          value={selectedCategories}
-          onChange={setSelectedCategories}
+          value={formData.categories}
+          onChange={value => handleChange('categories', value)}
         />
+        {errors.categories && <p className="text-red-500 text-sm mt-1">{errors.categories}</p>}
       </div>
-      <button className="btn btn-primary" disabled={loading}>
-        {loading ? "Adding..." : "Add Todo"}
-      </button>
+
+      {errors.submit && (
+        <p className="text-red-500 text-sm">{errors.submit}</p>
+      )}
+
+      <div className="flex gap-2">
+        <button 
+          className="btn btn-primary" 
+          type="submit"
+          disabled={loading}
+        >
+          {loading ? "Saving..." : initialData ? "Update Todo" : "Add Todo"}
+        </button>
+        {onCancel && (
+          <button 
+            className="btn btn-secondary" 
+            type="button" 
+            onClick={onCancel}
+          >
+            Cancel
+          </button>
+        )}
+      </div>
     </form>
   );
 };
