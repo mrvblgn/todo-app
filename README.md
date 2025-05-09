@@ -1,61 +1,149 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# Todo App
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+Modern ve kullanıcı dostu bir Todo uygulaması. Laravel ve React kullanılarak geliştirilmiş, JWT tabanlı kimlik doğrulama sistemi ile güvenli bir şekilde çalışan web uygulaması.
 
-## About Laravel
+## 🚀 Özellikler
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+- 🔐 JWT tabanlı kimlik doğrulama sistemi (Bonus)
+- 📝 Todo oluşturma, düzenleme, silme ve tamamlama
+- 📁 Kategori yönetimi (Bonus)
+- 🎨 Modern ve responsive tasarım (Tailwind CSS)
+- 🔄 Gerçek zamanlı durum yönetimi (Redux Toolkit)
+- 📱 Mobil uyumlu arayüz
+- ⚡ Hızlı ve optimize edilmiş performans
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+## 🛠️ Teknoloji Stack'i
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+### Backend
+- Laravel 12.0
+- PHP 8.4.1
+- MySQL
+- JWT Authentication
+- Laravel Sanctum
 
-## Learning Laravel
+### Frontend
+- React 18
+- Vite
+- Redux Toolkit
+- React Router DOM
+- Tailwind CSS
+- Headless UI
+- React Hook Form
+- Yup (Form validasyonu)
+- React Toastify
+- Axios
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+## 📋 Kurulum Adımları
 
-You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
+### Backend Kurulumu
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+1. Projeyi klonlayın:
+```bash
+git clone [repo-url]
+cd todo-app
+```
 
-## Laravel Sponsors
+2. Composer bağımlılıklarını yükleyin:
+```bash
+composer install
+```
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+3. `.env` dosyasını oluşturun:
+```bash
+cp .env.example .env
+```
 
-### Premium Partners
+4. Uygulama anahtarını oluşturun:
+```bash
+php artisan key:generate
+```
 
-- **[Vehikl](https://vehikl.com/)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel/)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Redberry](https://redberry.international/laravel-development/)**
-- **[Active Logic](https://activelogic.com)**
+5. JWT secret key'i oluşturun:
+```bash
+php artisan jwt:secret
+```
 
-## Contributing
+6. Veritabanı ayarlarını yapılandırın:
+- `.env` dosyasında veritabanı bilgilerinizi güncelleyin
+- Veritabanını oluşturun
+- Migrationları çalıştırın:
+```bash
+php artisan migrate
+```
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+### Frontend Kurulumu
 
-## Code of Conduct
+1. Node.js bağımlılıklarını yükleyin:
+```bash
+npm install
+```
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+2. Geliştirme sunucusunu başlatın:
+```bash
+npm run dev
+```
 
-## Security Vulnerabilities
+## 🚀 Çalıştırma Talimatları
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+1. Backend sunucusunu başlatın:
+```bash
+php artisan serve
+```
 
-## License
+2. Frontend geliştirme sunucusunu başlatın:
+```bash
+npm run dev
+```
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+3. Tarayıcınızda `http://localhost:8000` adresine gidin
+
+## 📚 API Dokümantasyonu
+
+API endpoint'leri ve kullanımları için Postman koleksiyonunu inceleyebilirsiniz:
+[Todo App Postman Collection](Todo%20App.postman_collection.json)
+
+### API Endpoint'leri
+
+#### Kimlik Doğrulama
+- POST `/api/auth/register` - Yeni kullanıcı kaydı
+- POST `/api/auth/login` - Kullanıcı girişi
+- POST `/api/auth/logout` - Çıkış yapma (Korumalı)
+- GET `/api/auth/refresh` - Token yenileme (Korumalı)
+
+#### Todo İşlemleri (Korumalı)
+- GET `/api/todos` - Tüm todoları listeleme
+- GET `/api/todos/{id}` - ID'ye göre todo getirme
+- GET `/api/todos/search` - Todo arama
+- POST `/api/todos` - Yeni todo oluşturma
+- PUT `/api/todos/{id}` - Todo güncelleme
+- PATCH `/api/todos/{id}/status` - Todo durumunu güncelleme
+- DELETE `/api/todos/{id}` - Todo silme
+
+#### İstatistik Endpointleri (Korumalı)
+- GET `/api/stats/todos` - Todo'ların durumlarına göre istatistikleri
+- GET `/api/stats/priorities` - Todo'ların önceliklerine göre istatistikleri
+
+#### Kategori İşlemleri
+- GET `/api/categories` - Tüm kategorileri listeleme (Public)
+- GET `/api/categories/{id}` - ID'ye göre kategori getirme (Public)
+- GET `/api/categories/{id}/todos` - Kategoriye ait todoları getirme (Korumalı)
+- POST `/api/categories` - Yeni kategori oluşturma (Korumalı)
+- PUT `/api/categories/{id}` - Kategori güncelleme (Korumalı)
+- DELETE `/api/categories/{id}` - Kategori silme (Korumalı)
+
+## 💡 Örnek Kullanım Senaryoları
+
+1. **Kullanıcı Kaydı ve Girişi**
+   - Yeni bir hesap oluşturun
+   - Giriş yapın ve JWT token alın
+   - Token ile API isteklerini gerçekleştirin
+
+2. **Todo Yönetimi**
+   - Yeni bir todo oluşturun
+   - Todo'yu bir kategoriye atayın
+   - Todo'yu tamamlandı olarak işaretleyin
+   - Todo'yu düzenleyin veya silin
+
+3. **Kategori Yönetimi**
+   - Yeni kategoriler oluşturun
+   - Kategorileri düzenleyin veya silin
