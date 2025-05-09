@@ -20,7 +20,7 @@ const TodoPage = () => {
         <div className="min-h-screen p-8 relative">
             <div className="max-w-7xl mx-auto">
                 <div className="flex items-center justify-between mb-6">
-                    <h1 className="text-3xl font-bold">Todos</h1>
+                    <h1 className="text-3xl font-bold">Yapılacaklar</h1>
                     <button
                         className="bg-green-500 hover:bg-green-600 text-white rounded-full shadow-lg w-16 h-16 text-3xl flex items-center justify-center transition-all duration-200"
                         onClick={() => navigate("/create-todo")}
