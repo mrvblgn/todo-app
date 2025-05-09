@@ -49,12 +49,14 @@ class CategoryController extends Controller
 
     public function update(UpdateCategoryRequest $request, int $id): JsonResponse
     {
-        $validated = $request->validated();
-        $updatedCategory = $this->categoryService->update($id, $validated);
-
-        if (!$updatedCategory) {
+        $category = $this->categoryService->getById($id);
+        if (!$category) {
             return response()->json(['message' => 'Kategori bulunamadı'], 404);
         }
+
+        $this->categoryService->update($id, $request->validated());
+        
+        $updatedCategory = $this->categoryService->getById($id);
 
         return response()->json(new CategoryResource($updatedCategory));
     }

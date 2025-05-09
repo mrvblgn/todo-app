@@ -10,6 +10,7 @@ import Register from './pages/Register';
 import CategoryPage from './pages/CategoryPage';
 import TodoPage from './pages/TodoPage';
 import CreateTodoPage from './pages/CreateTodoPage';
+import CreateCategoryPage from './pages/CreateCategoryPage';
 
 const App = () => {
     return (
@@ -22,6 +23,7 @@ const App = () => {
                 <Route path="/categories" element={<CategoryPage />} />
                 <Route path="/todos" element={<TodoPage />} />
                 <Route path="/create-todo" element={<CreateTodoPage />} />
+                <Route path="/create-category" element={<CreateCategoryPage />} />
             </Routes>
         </MainLayout>
     );

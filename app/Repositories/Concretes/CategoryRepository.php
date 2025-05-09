@@ -13,7 +13,7 @@ class CategoryRepository implements ICategoryRepository
         return Category::all();
     }
 
-    public function findById(int $id): ?Category
+    public function getById(int $id): ?Category
     {
         return Category::find($id);
     }
@@ -25,7 +25,7 @@ class CategoryRepository implements ICategoryRepository
 
     public function update(int $id, array $data): bool
     {
-        $category = $this->findById($id);
+        $category = $this->getById($id);
 
         if ($category) {
             return $category->update($data);

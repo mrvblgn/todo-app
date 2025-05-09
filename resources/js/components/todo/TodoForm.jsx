@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { createTodo } from "@/services/todoService";
 import { getAllCategories } from "@/services/categoryService";
+import CategorySelector from "@/components/category/CategorySelector";
 
 const priorities = [
   { value: "low", label: "Low" },
@@ -46,7 +47,7 @@ const TodoForm = ({ onTodoCreated }) => {
       setDueDate("");
       setSelectedCategories([]);
     } catch (err) {
-      alert("Todo could not be created!");
+      alert("Todo oluşturulamadı!");
     } finally {
       setLoading(false);
     }
@@ -76,16 +77,11 @@ const TodoForm = ({ onTodoCreated }) => {
       </div>
       <div>
         <label className="block font-medium">Categories</label>
-        <select
-          className="input"
-          multiple
+        <CategorySelector
+          categories={categories}
           value={selectedCategories}
-          onChange={e => setSelectedCategories(Array.from(e.target.selectedOptions, opt => Number(opt.value)))}
-        >
-          {categories.map(cat => (
-            <option key={cat.id} value={cat.id}>{cat.name}</option>
-          ))}
-        </select>
+          onChange={setSelectedCategories}
+        />
       </div>
       <button className="btn btn-primary" disabled={loading}>
         {loading ? "Adding..." : "Add Todo"}
