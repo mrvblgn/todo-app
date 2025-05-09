@@ -19,7 +19,6 @@ Modern ve kullanıcı dostu bir Todo uygulaması. Laravel ve React kullanılarak
 - PHP 8.4.1
 - MySQL
 - JWT Authentication
-- Laravel Sanctum
 
 ### Frontend
 - React 18
