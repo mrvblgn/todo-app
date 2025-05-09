@@ -1,12 +1,16 @@
 import React, { useEffect, useState } from "react";
-import { getAllTodos, searchTodos } from "@/services/todoService";
+import { getAllTodos, searchTodos, deleteTodo } from "@/services/todoService";
 import Pagination from "@/components/common/Pagination";
+import TodoItem from "@/components/todo/TodoItem";
+import TodoForm from "@/components/todo/TodoForm";
 
 const TodoList = ({ filters = {}, page = 1, onPageChange }) => {
   const [todos, setTodos] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [meta, setMeta] = useState(null);
+  const [selectedTodo, setSelectedTodo] = useState(null);
+  const [editTodo, setEditTodo] = useState(null);
 
   useEffect(() => {
     const fetchTodos = async () => {
@@ -35,6 +39,28 @@ const TodoList = ({ filters = {}, page = 1, onPageChange }) => {
     fetchTodos();
   }, [filters, page]);
 
+  // Silme işlemi
+  const handleDelete = async (id) => {
+    if (!window.confirm("Bu todo silinsin mi?")) return;
+    try {
+      await deleteTodo(id);
+      setTodos(todos.filter(todo => todo.id !== id));
+    } catch (err) {
+      alert("Todo silinemedi!");
+    }
+  };
+
+  // Düzenleme işlemi (modal aç/kapat)
+  const handleEdit = (todo) => {
+    setEditTodo(todo);
+  };
+
+  // Düzenleme formu submit edildiğinde
+  const handleEditSuccess = (updatedTodo) => {
+    setTodos(todos.map(todo => todo.id === updatedTodo.id ? updatedTodo : todo));
+    setEditTodo(null);
+  };
+
   if (loading) return <div className="text-center py-4">Loading...</div>;
   if (error) return <div className="text-red-500 text-center py-4">{error}</div>;
   if (!todos.length) return <div className="text-center py-4">No todos found</div>;
@@ -44,21 +70,12 @@ const TodoList = ({ filters = {}, page = 1, onPageChange }) => {
       <h2 className="text-xl font-bold mb-4">Yapılacaklar Listen</h2>
       <ul className="space-y-2">
         {todos.map(todo => (
-          <li key={todo.id} className="p-3 bg-gray-50 rounded-lg">
-            <div className="flex items-center justify-between">
-              <span className="font-medium">{todo.title}</span>
-              <span className={`px-2 py-1 rounded text-sm ${
-                todo.status === 'completed' ? 'bg-green-100 text-green-800' :
-                todo.status === 'in_progress' ? 'bg-blue-100 text-blue-800' :
-                'bg-yellow-100 text-yellow-800'
-              }`}>
-                {todo.status}
-              </span>
-            </div>
-            {todo.description && (
-              <p className="text-gray-600 mt-1">{todo.description}</p>
-            )}
-          </li>
+          <TodoItem
+            key={todo.id}
+            todo={todo}
+            onEdit={handleEdit}
+            onDelete={handleDelete}
+          />
         ))}
       </ul>
       {meta && onPageChange && (
@@ -67,6 +84,38 @@ const TodoList = ({ filters = {}, page = 1, onPageChange }) => {
           totalPages={meta.last_page}
           onPageChange={onPageChange}
         />
+      )}
+
+      {/* Detay modalı */}
+      {selectedTodo && (
+        <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg shadow-lg p-6 max-w-md w-full relative">
+            <button
+              className="absolute top-2 right-2 text-gray-500 hover:text-gray-800 text-2xl"
+              onClick={() => setSelectedTodo(null)}
+              title="Kapat"
+            >×</button>
+            <TodoItem todo={selectedTodo} />
+          </div>
+        </div>
+      )}
+
+      {/* Düzenleme modalı */}
+      {editTodo && (
+        <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg shadow-lg p-6 max-w-md w-full relative">
+            <button
+              className="absolute top-2 right-2 text-gray-500 hover:text-gray-800 text-2xl"
+              onClick={() => setEditTodo(null)}
+              title="Kapat"
+            >×</button>
+            <TodoForm
+              initialData={editTodo}
+              onSuccess={handleEditSuccess}
+              onCancel={() => setEditTodo(null)}
+            />
+          </div>
+        </div>
       )}
     </div>
   );
