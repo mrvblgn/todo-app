@@ -3,6 +3,10 @@
 namespace App\Services\Concretes;
 
 use App\Models\Todo;
+use App\Exceptions\TodoNotFoundException;
+use App\Exceptions\InvalidStatusException;
+use App\Exceptions\EmptySearchQueryException;
+use App\Exceptions\InvalidPriorityException;
 use Illuminate\Pagination\LengthAwarePaginator;
 use App\Repositories\Abstracts\ITodoRepository;
 use App\Services\Abstracts\ITodoService;
@@ -27,7 +31,7 @@ class TodoService implements ITodoService
         $todo = $this->todoRepository->findById($id);
         
         if (!$todo) {
-            throw new \InvalidArgumentException('Todo bulunamadı');
+            throw new TodoNotFoundException();
         }
 
         return $todo;
@@ -35,6 +39,10 @@ class TodoService implements ITodoService
 
     public function create(array $data): Todo
     {
+        if (isset($data['priority']) && !in_array($data['priority'], ['low', 'medium', 'high'])) {
+            throw new InvalidPriorityException();
+        }
+
         $categoryIds = $data['categories'] ?? [];
         unset($data['categories']);
 
@@ -49,10 +57,14 @@ class TodoService implements ITodoService
 
     public function update(int $id, array $data): ?Todo
     {
+        if (isset($data['priority']) && !in_array($data['priority'], ['low', 'medium', 'high'])) {
+            throw new InvalidPriorityException();
+        }
+
         $todo = $this->findById($id);
         
         if (!$todo) {
-            throw new \InvalidArgumentException('Todo bulunamadı');
+            throw new TodoNotFoundException();
         }
 
         return $this->todoRepository->update($id, $data);
@@ -61,13 +73,13 @@ class TodoService implements ITodoService
     public function updateStatus(int $id, string $status): ?Todo
     {
         if (!in_array($status, ['pending', 'in_progress', 'completed', 'cancelled'])) {
-            throw new \InvalidArgumentException('Geçersiz status');
+            throw new InvalidStatusException();
         }
 
         $todo = $this->findById($id);
         
         if (!$todo) {
-            throw new \InvalidArgumentException('Todo bulunamadı');
+            throw new TodoNotFoundException();
         }
 
         return $this->todoRepository->updateStatus($id, $status);
@@ -78,7 +90,7 @@ class TodoService implements ITodoService
         $todo = $this->findById($id);
         
         if (!$todo) {
-            throw new \InvalidArgumentException('Todo bulunamadı');
+            throw new TodoNotFoundException();
         }
 
         return $this->todoRepository->delete($id);
@@ -87,7 +99,7 @@ class TodoService implements ITodoService
     public function search(string $query): Collection
     {
         if (empty($query)) {
-            throw new \InvalidArgumentException('Arama terimi gerekli');
+            throw new EmptySearchQueryException();
         }
 
         return $this->todoRepository->search($query);

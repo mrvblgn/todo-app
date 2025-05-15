@@ -3,6 +3,7 @@
 namespace App\Services\Concretes;
 
 use App\Models\Category;
+use App\Exceptions\CategoryNotFoundException;
 use App\Repositories\Abstracts\ICategoryRepository;
 use App\Services\Abstracts\ICategoryService;
 use Illuminate\Database\Eloquent\Collection;
@@ -26,7 +27,7 @@ class CategoryService implements ICategoryService
         $category = $this->categoryRepository->getById($id);
         
         if (!$category) {
-            throw new \InvalidArgumentException('Kategori bulunamadı');
+            throw new CategoryNotFoundException();
         }
 
         return $category;
@@ -53,6 +54,7 @@ class CategoryService implements ICategoryService
 
     public function getTodosByCategory(int $id): Collection
     {
+        $this->getById($id); // Kategori var mı kontrol et
         return $this->categoryRepository->getTodosByCategory($id);
     }
 }

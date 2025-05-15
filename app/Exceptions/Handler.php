@@ -20,6 +20,42 @@ class Handler extends ExceptionHandler
 
     public function register(): void
     {
+        // Custom Business Logic Exceptions
+        $this->renderable(function (TodoNotFoundException $e) {
+            return response()->json([
+                'status' => 'error',
+                'message' => $e->getMessage()
+            ], 404);
+        });
+
+        $this->renderable(function (CategoryNotFoundException $e) {
+            return response()->json([
+                'status' => 'error',
+                'message' => $e->getMessage()
+            ], 404);
+        });
+
+        $this->renderable(function (InvalidStatusException $e) {
+            return response()->json([
+                'status' => 'error',
+                'message' => $e->getMessage()
+            ], 400);
+        });
+
+        $this->renderable(function (EmptySearchQueryException $e) {
+            return response()->json([
+                'status' => 'error',
+                'message' => $e->getMessage()
+            ], 400);
+        });
+
+        $this->renderable(function (InvalidPriorityException $e) {
+            return response()->json([
+                'status' => 'error',
+                'message' => $e->getMessage()
+            ], 400);
+        });
+
         // Business Logic Exceptions
         $this->renderable(function (\InvalidArgumentException $e) {
             return response()->json([
