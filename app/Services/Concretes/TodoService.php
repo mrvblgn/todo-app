@@ -60,7 +60,7 @@ class TodoService implements ITodoService
 
     public function updateStatus(int $id, string $status): ?Todo
     {
-        if (!in_array($status, ['pending', 'completed', 'overdue'])) {
+        if (!in_array($status, ['pending', 'in_progress', 'completed', 'cancelled'])) {
             throw new \InvalidArgumentException('Geçersiz status');
         }
 

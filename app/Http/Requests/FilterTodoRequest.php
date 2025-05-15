@@ -18,7 +18,7 @@ class FilterTodoRequest extends FormRequest
             'limit' => ['nullable', 'integer', 'min:1', 'max:50'],
             'sort' => ['nullable', 'string', 'in:created_at,due_date,priority'],
             'order' => ['nullable', 'string', 'in:asc,desc'],
-            'status' => ['nullable', 'string', 'in:pending,completed,overdue'],
+            'status' => ['nullable', 'string', 'in:pending,in_progress,completed,cancelled'],
             'priority' => ['nullable', 'string', 'in:low,medium,high'],
         ];
     }
@@ -31,7 +31,7 @@ class FilterTodoRequest extends FormRequest
             'limit.max' => 'Sayfa başına gösterilecek kayıt sayısı 50’den fazla olamaz.',
             'sort.in' => 'Sıralama alanı yalnızca: created_at, due_date, priority olabilir.',
             'order.in' => 'Sıralama yönü yalnızca: asc veya desc olabilir.',
-            'status.in' => 'Durum yalnızca: pending, completed, overdue olabilir.',
+            'status.in' => 'Durum yalnızca: pending, in_progress, completed, cancelled olabilir.',
             'priority.in' => 'Öncelik yalnızca: low, medium, high olabilir.',
         ];
     }
