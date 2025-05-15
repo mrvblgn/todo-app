@@ -24,31 +24,72 @@ class TodoService implements ITodoService
 
     public function findById(int $id): ?Todo
     {
-        return $this->todoRepository->findById($id);
+        $todo = $this->todoRepository->findById($id);
+        
+        if (!$todo) {
+            throw new \InvalidArgumentException('Todo bulunamadı');
+        }
+
+        return $todo;
     }
 
     public function create(array $data): Todo
     {
-        return $this->todoRepository->create($data);
+        $categoryIds = $data['categories'] ?? [];
+        unset($data['categories']);
+
+        $todo = $this->todoRepository->create($data);
+
+        if (!empty($categoryIds)) {
+            $todo->categories()->sync($categoryIds);
+        }
+
+        return $todo;
     }
 
     public function update(int $id, array $data): ?Todo
     {
+        $todo = $this->findById($id);
+        
+        if (!$todo) {
+            throw new \InvalidArgumentException('Todo bulunamadı');
+        }
+
         return $this->todoRepository->update($id, $data);
     }
 
     public function updateStatus(int $id, string $status): ?Todo
     {
+        if (!in_array($status, ['pending', 'completed', 'overdue'])) {
+            throw new \InvalidArgumentException('Geçersiz status');
+        }
+
+        $todo = $this->findById($id);
+        
+        if (!$todo) {
+            throw new \InvalidArgumentException('Todo bulunamadı');
+        }
+
         return $this->todoRepository->updateStatus($id, $status);
     }
 
     public function delete(int $id): bool
     {
+        $todo = $this->findById($id);
+        
+        if (!$todo) {
+            throw new \InvalidArgumentException('Todo bulunamadı');
+        }
+
         return $this->todoRepository->delete($id);
     }
 
     public function search(string $query): Collection
     {
+        if (empty($query)) {
+            throw new \InvalidArgumentException('Arama terimi gerekli');
+        }
+
         return $this->todoRepository->search($query);
     }
 

@@ -47,14 +47,6 @@ class TodoController extends Controller
     public function findById(int $id): JsonResponse
     {
         $todo = $this->todoService->findById($id);
-
-        if (!$todo) {
-            return response()->json([
-                'status' => 'error',
-                'message' => 'Todo bulunamadı'
-            ], 404);
-        }
-
         return response()->json([
             'status' => 'success',
             'data' => new TodoResource($todo)
@@ -65,17 +57,7 @@ class TodoController extends Controller
     {
         $validated = $request->validated();
         $validated['user_id'] = auth()->id();
-        
-        // Kategorileri al ve validasyondan çıkar
-        $categoryIds = $validated['categories'] ?? [];
-        unset($validated['categories']);
-
         $todo = $this->todoService->create($validated);
-
-        // Kategorileri ilişkilendir
-        if (!empty($categoryIds)) {
-            $todo->categories()->sync($categoryIds);
-        }
 
         return response()->json([
             'status' => 'success',
@@ -86,16 +68,8 @@ class TodoController extends Controller
 
     public function update(UpdateTodoRequest $request, int $id): JsonResponse
     {
-        $todo = $this->todoService->findById($id);
-        if (!$todo) {
-            return response()->json([
-                'status' => 'error',
-                'message' => 'Todo bulunamadı'
-            ], 404);
-        }
-
-        $this->authorize('update', $todo); 
-
+        $this->authorize('update', $this->todoService->findById($id));
+        
         $validated = $request->validated();
         $updatedTodo = $this->todoService->update($id, $validated);
 
@@ -109,22 +83,7 @@ class TodoController extends Controller
     public function updateStatus(Request $request, int $id): JsonResponse
     {
         $status = $request->input('status');
-
-        if (!in_array($status, ['pending', 'completed', 'overdue'])) {
-            return response()->json([
-                'status' => 'error',
-                'message' => 'Geçersiz status'
-            ], 400);
-        }
-
         $updatedTodo = $this->todoService->updateStatus($id, $status);
-
-        if (!$updatedTodo) {
-            return response()->json([
-                'status' => 'error',
-                'message' => 'Todo bulunamadı'
-            ], 404);
-        }
 
         return response()->json([
             'status' => 'success',
@@ -135,17 +94,8 @@ class TodoController extends Controller
 
     public function delete(int $id): JsonResponse
     {
-        $todo = $this->todoService->findById($id);
-        if (!$todo) {
-            return response()->json([
-                'status' => 'error',
-                'message' => 'Todo bulunamadı'
-            ], 404);
-        }
-
-        $this->authorize('delete', $todo);
-
-        $deleted = $this->todoService->delete($id);
+        $this->authorize('delete', $this->todoService->findById($id));
+        $this->todoService->delete($id);
 
         return response()->json([
             'status' => 'success',
@@ -156,14 +106,8 @@ class TodoController extends Controller
     public function search(Request $request): JsonResponse
     {
         $query = $request->input('q');
-        if (empty($query)) {
-            return response()->json([
-                'status' => 'error',
-                'message' => 'Arama terimi gerekli'
-            ], 400);
-        }
-
         $todos = $this->todoService->search($query);
+        
         return response()->json([
             'status' => 'success',
             'data' => TodoResource::collection($todos)

@@ -16,6 +16,7 @@ class AuthController extends Controller
     public function register(RegisterRequest $request): JsonResponse
     {
         $user = $this->authService->register($request->validated());
+
         return response()->json([
             'status' => 'success',
             'message' => 'Kayıt başarılı',
@@ -26,6 +27,7 @@ class AuthController extends Controller
     public function login(LoginRequest $request): JsonResponse
     {
         $token = $this->authService->login($request->validated());
+
         return response()->json([
             'status' => 'success',
             'message' => 'Giriş başarılı',
@@ -36,6 +38,7 @@ class AuthController extends Controller
     public function refresh(): JsonResponse
     {
         $token = $this->authService->refresh();
+
         return response()->json([
             'status' => 'success',
             'message' => 'Token başarıyla yenilendi',
@@ -46,6 +49,7 @@ class AuthController extends Controller
     public function logout(): JsonResponse
     {
         $this->authService->logout();
+        
         return response()->json([
             'status' => 'success',
             'message' => 'Başarıyla çıkış yapıldı'

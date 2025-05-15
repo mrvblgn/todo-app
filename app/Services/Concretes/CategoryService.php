@@ -23,7 +23,13 @@ class CategoryService implements ICategoryService
 
     public function getById(int $id): ?Category
     {
-        return $this->categoryRepository->getById($id);
+        $category = $this->categoryRepository->getById($id);
+        
+        if (!$category) {
+            throw new \InvalidArgumentException('Kategori bulunamadı');
+        }
+
+        return $category;
     }
 
     public function create(array $data): Category
@@ -31,13 +37,17 @@ class CategoryService implements ICategoryService
         return $this->categoryRepository->create($data);
     }
 
-    public function update(int $id, array $data): bool
+    public function update(int $id, array $data): Category
     {
-        return $this->categoryRepository->update($id, $data);
+        $category = $this->getById($id);
+        $this->categoryRepository->update($id, $data);
+        
+        return $this->getById($id);
     }
 
     public function delete(int $id): bool
     {
+        $this->getById($id);
         return $this->categoryRepository->delete($id);
     }
 

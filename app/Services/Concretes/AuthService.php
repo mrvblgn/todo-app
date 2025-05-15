@@ -19,6 +19,7 @@ class AuthService implements IAuthService
         $user = $this->authRepository->register($data);
 
         $token = auth()->login($user);
+        
         return ['user' => $user, 'token' => $token];
     }
 

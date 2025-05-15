@@ -36,7 +36,7 @@ class CategoryRepository implements ICategoryRepository
 
     public function delete(int $id): bool
     {
-        $category = $this->findById($id);
+        $category = $this->getById($id);
 
         if ($category) {
             return $category->delete();
@@ -47,7 +47,7 @@ class CategoryRepository implements ICategoryRepository
 
     public function getTodosByCategory(int $id): Collection
     {
-        $category = $this->findById($id);
+        $category = $this->getById($id);
 
         if ($category) {
             return $category->todos;

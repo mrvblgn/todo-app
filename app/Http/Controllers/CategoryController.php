@@ -31,12 +31,11 @@ class CategoryController extends Controller
     public function getById(int $id): JsonResponse
     {
         $category = $this->categoryService->getById($id);
-
-        if (!$category) {
-            return response()->json(['message' => 'Kategori bulunamadı'], 404);
-        }
-
-        return response()->json(new CategoryResource($category));
+        
+        return response()->json([
+            'status' => 'success',
+            'data' => new CategoryResource($category)
+        ]);
     }
 
     public function create(CreateCategoryRequest $request): JsonResponse
@@ -44,32 +43,32 @@ class CategoryController extends Controller
         $validated = $request->validated();
         $category = $this->categoryService->create($validated);
 
-        return response()->json(new CategoryResource($category), 201);
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Kategori başarıyla oluşturuldu',
+            'data' => new CategoryResource($category)
+        ], 201);
     }
 
     public function update(UpdateCategoryRequest $request, int $id): JsonResponse
     {
-        $category = $this->categoryService->getById($id);
-        if (!$category) {
-            return response()->json(['message' => 'Kategori bulunamadı'], 404);
-        }
+        $updatedCategory = $this->categoryService->update($id, $request->validated());
 
-        $this->categoryService->update($id, $request->validated());
-        
-        $updatedCategory = $this->categoryService->getById($id);
-
-        return response()->json(new CategoryResource($updatedCategory));
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Kategori başarıyla güncellendi',
+            'data' => new CategoryResource($updatedCategory)
+        ]);
     }
 
     public function delete(int $id): JsonResponse
     {
-        $deleted = $this->categoryService->delete($id);
+        $this->categoryService->delete($id);
 
-        if (!$deleted) {
-            return response()->json(['message' => 'Kategori bulunamadı'], 404);
-        }
-
-        return response()->json(['message' => 'Kategori başarıyla silindi'], 204);
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Kategori başarıyla silindi'
+        ]);
     }
 
     public function getTodosByCategory(int $id): JsonResponse
