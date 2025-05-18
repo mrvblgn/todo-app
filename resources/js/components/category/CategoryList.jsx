@@ -1,7 +1,7 @@
 import React, { useEffect } from "react";
 import { useDispatch, useSelector } from 'react-redux';
 import { setCategories, setLoading, setError, addCategory, updateCategory, deleteCategory } from '@/store/slices/categorySlice';
-import { getAllCategories, createCategory, updateCategory as updateCategoryService, deleteCategory as deleteCategoryService } from "@/services/categoryService";
+import { getAllCategories, createCategory, updateCategory as updateCategoryService, deleteCategory as deleteCategoryService, getTodosByCategory } from "@/services/categoryService";
 import CategoryForm from "@/components/category/CategoryForm";
 
 const CategoryList = () => {
@@ -10,6 +10,7 @@ const CategoryList = () => {
     const [showForm, setShowForm] = React.useState(false);
     const [editCategory, setEditCategory] = React.useState(null);
     const [deleteCategoryId, setDeleteCategoryId] = React.useState(null);
+    const [categoryTodos, setCategoryTodos] = React.useState({});
 
     const fetchCategories = async () => {
         dispatch(setLoading(true));
@@ -30,6 +31,15 @@ const CategoryList = () => {
     useEffect(() => {
         fetchCategories();
     }, [dispatch]);
+
+    // Kategoriler yüklendikten sonra, her kategori için todo'ları çek
+    useEffect(() => {
+        if (categories.length > 0) {
+            categories.forEach(category => {
+                fetchTodosForCategory(category.id);
+            });
+        }
+    }, [categories]);
 
     const handleSave = async (data) => {
         try {
@@ -54,6 +64,22 @@ const CategoryList = () => {
             setDeleteCategoryId(null);
         } catch {
             alert("Kategori silinemedi!");
+        }
+    };
+
+    const fetchTodosForCategory = async (categoryId) => {
+        if (categoryTodos[categoryId]) return; // daha önce yüklendiyse tekrar çekme
+        try {
+            const res = await getTodosByCategory(categoryId);
+            setCategoryTodos(prev => ({
+                ...prev,
+                [categoryId]: res.data // API yanıtındaki todo listesi
+            }));
+        } catch (err) {
+            setCategoryTodos(prev => ({
+                ...prev,
+                [categoryId]: []
+            }));
         }
     };
 
@@ -116,6 +142,20 @@ const CategoryList = () => {
                                     Sil
                                 </button>
                             </div>
+                        </div>
+                        <div>
+                            <strong>Todo'lar:</strong>
+                            <ul className="list-disc ml-6">
+                                {categoryTodos[category.id]
+                                    ? (categoryTodos[category.id].length === 0
+                                        ? <li>Bu kategoriye ait todo yok.</li>
+                                        : categoryTodos[category.id].map(todo => (
+                                            <li key={todo.id}>{todo.title}</li>
+                                        ))
+                                    )
+                                    : <li>Yükleniyor...</li>
+                                }
+                            </ul>
                         </div>
                     </div>
                 ))}
