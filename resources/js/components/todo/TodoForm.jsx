@@ -100,7 +100,7 @@ const TodoForm = ({ onTodoCreated, initialData, onSuccess, onCancel }) => {
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
       <div>
-        <label className="block font-medium">Title</label>
+        <label className="block font-medium">Başlık</label>
         <input 
           className={`input ${errors.title ? 'border-red-500' : ''}`}
           value={formData.title}
@@ -110,7 +110,7 @@ const TodoForm = ({ onTodoCreated, initialData, onSuccess, onCancel }) => {
       </div>
 
       <div>
-        <label className="block font-medium">Description</label>
+        <label className="block font-medium">Açıklama</label>
         <textarea 
           className={`input ${errors.description ? 'border-red-500' : ''}`}
           value={formData.description}
@@ -134,7 +134,7 @@ const TodoForm = ({ onTodoCreated, initialData, onSuccess, onCancel }) => {
       </div>
 
       <div>
-        <label className="block font-medium">Due Date</label>
+        <label className="block font-medium">Bitiş Tarihi</label>
         <input 
           className={`input ${errors.dueDate ? 'border-red-500' : ''}`}
           type="date"
@@ -145,7 +145,7 @@ const TodoForm = ({ onTodoCreated, initialData, onSuccess, onCancel }) => {
       </div>
 
       <div>
-        <label className="block font-medium">Categories</label>
+        <label className="block font-medium">Kategoriler</label>
         <CategorySelector
           categories={categories}
           value={formData.categories}
@@ -164,7 +164,7 @@ const TodoForm = ({ onTodoCreated, initialData, onSuccess, onCancel }) => {
           type="submit"
           disabled={loading}
         >
-          {loading ? "Saving..." : initialData ? "Update Todo" : "Add Todo"}
+          {loading ? "Saving..." : initialData ? "Todo'yu Güncelle" : "Todo Ekle"}
         </button>
         {onCancel && (
           <button 
@@ -172,7 +172,7 @@ const TodoForm = ({ onTodoCreated, initialData, onSuccess, onCancel }) => {
             type="button" 
             onClick={onCancel}
           >
-            Cancel
+            İptal Et
           </button>
         )}
       </div>

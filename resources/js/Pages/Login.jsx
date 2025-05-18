@@ -30,7 +30,7 @@ const Login = () => {
 
   return (
     <div className="max-w-md mx-auto mt-20 p-8 bg-white rounded shadow">
-      <h2 className="text-2xl font-bold mb-6">Login</h2>
+      <h2 className="text-2xl font-bold mb-6">Giriş Yap</h2>
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
         <div>
           <label className="label">Email</label>
@@ -38,12 +38,12 @@ const Login = () => {
           {errors.email && <p className="text-red-500">{errors.email.message}</p>}
         </div>
         <div>
-          <label className="label">Password</label>
+          <label className="label">Şifre</label>
           <input className="input" type="password" {...formRegister("password")} />
           {errors.password && <p className="text-red-500">{errors.password.message}</p>}
         </div>
         <button className="btn btn-primary w-full" disabled={isSubmitting}>
-          {isSubmitting ? "Logging in..." : "Login"}
+          {isSubmitting ? "Giriş yapılıyor..." : "Giriş Yap"}
         </button>
       </form>
     </div>

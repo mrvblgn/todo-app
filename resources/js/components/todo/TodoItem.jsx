@@ -4,6 +4,7 @@ const statusColors = {
   completed: "bg-green-100 text-green-800",
   in_progress: "bg-blue-100 text-blue-800",
   pending: "bg-yellow-100 text-yellow-800",
+  cancelled: "bg-red-100 text-yellow-800",
 };
 
 const TodoItem = ({ todo, onStatusChange, onEdit, onDelete }) => (
@@ -22,9 +23,10 @@ const TodoItem = ({ todo, onStatusChange, onEdit, onDelete }) => (
           value={todo.status}
           onChange={e => onStatusChange(todo.id, e.target.value)}
         >
-          <option value="pending">pending</option>
-          <option value="in_progress">in_progress</option>
-          <option value="completed">completed</option>
+          <option value="pending">bekliyor</option>
+          <option value="in_progress">devam ediyor</option>
+          <option value="completed">tamamlandı</option>
+          <option value="cancelled">iptal edildi</option>
         </select>
       )}
       {onEdit && (

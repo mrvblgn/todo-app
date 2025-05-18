@@ -50,7 +50,7 @@ class CategoryRepository implements ICategoryRepository
         $category = $this->getById($id);
 
         if ($category) {
-            return $category->todos;
+            return $category->todos->where('user_id', auth()->id());
         }
 
         return collect();  // Eğer kategori bulunmazsa boş koleksiyon döndür

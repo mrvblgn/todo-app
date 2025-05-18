@@ -5,12 +5,12 @@ import useAuth from "@/hooks/useAuth";
 const leftNavigation = [
     { name: 'Dashboard', href: '/dashboard' },
     { name: 'Todos', href: '/todos' },
-    { name: 'Categories', href: '/categories' },
+    { name: 'Kategoriler', href: '/categories' },
 ];
 
 const rightNavigation = [
-    { name: 'Login', href: '/login' },
-    { name: 'Register', href: '/register' },
+    { name: 'Giriş Yap', href: '/login' },
+    { name: 'Kaydol', href: '/register' },
 ];
 
 const MainLayout = ({ children }) => {
@@ -74,7 +74,7 @@ const MainLayout = ({ children }) => {
                                     }}
                                     className="btn btn-secondary"
                                 >
-                                    Logout
+                                    Çıkış Yap
                                 </button>
                             )}
                             <button

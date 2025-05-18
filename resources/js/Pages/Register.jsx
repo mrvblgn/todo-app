@@ -33,10 +33,10 @@ const Register = () => {
 
   return (
     <div className="max-w-md mx-auto mt-20 p-8 bg-white rounded shadow">
-      <h2 className="text-2xl font-bold mb-6">Register</h2>
+      <h2 className="text-2xl font-bold mb-6">Kaydol</h2>
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
         <div>
-          <label className="label">Name</label>
+          <label className="label">İsim</label>
           <input className="input" {...formRegister("name")} />
           {errors.name && <p className="text-red-500">{errors.name.message}</p>}
         </div>
@@ -46,17 +46,17 @@ const Register = () => {
           {errors.email && <p className="text-red-500">{errors.email.message}</p>}
         </div>
         <div>
-          <label className="label">Password</label>
+          <label className="label">Şifre</label>
           <input className="input" type="password" {...formRegister("password")} />
           {errors.password && <p className="text-red-500">{errors.password.message}</p>}
         </div>
         <div>
-          <label className="label">Password Confirmation</label>
+          <label className="label">Şifre Onay</label>
           <input className="input" type="password" {...formRegister("password_confirmation")} />
           {errors.password_confirmation && <p className="text-red-500">{errors.password_confirmation.message}</p>}
         </div>
         <button className="btn btn-primary w-full" disabled={isSubmitting}>
-          {isSubmitting ? "Registering..." : "Register"}
+          {isSubmitting ? "Kayıt olunuyor..." : "Kaydol"}
         </button>
       </form>
     </div>

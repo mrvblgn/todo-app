@@ -43,7 +43,7 @@ const CategoryForm = ({ initialData, onSubmit, onCancel }) => {
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
       <div>
-        <label className="block font-medium">Name</label>
+        <label className="block font-medium">Kategori Adı</label>
         <input 
           className={`input ${errors.name ? 'border-red-500' : ''}`}
           value={formData.name}
@@ -53,7 +53,7 @@ const CategoryForm = ({ initialData, onSubmit, onCancel }) => {
       </div>
 
       <div>
-        <label className="block font-medium">Color</label>
+        <label className="block font-medium">Kategori Rengi</label>
         <input
           type="color"
           className={`w-12 h-8 p-0 border-0 ${errors.color ? 'border-red-500' : ''}`}
@@ -65,7 +65,7 @@ const CategoryForm = ({ initialData, onSubmit, onCancel }) => {
 
       <div className="flex gap-2">
         <button className="btn btn-primary" type="submit">
-          {initialData ? "Update Category" : "Create Category"}
+          {initialData ? "Kategoriyi Güncelle" : "Kategori Oluştur"}
         </button>
         {onCancel && (
           <button 
@@ -73,7 +73,7 @@ const CategoryForm = ({ initialData, onSubmit, onCancel }) => {
             type="button" 
             onClick={onCancel}
           >
-            Cancel
+            İptal Et
           </button>
         )}
       </div>

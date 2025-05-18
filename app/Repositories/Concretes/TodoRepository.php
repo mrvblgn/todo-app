@@ -11,7 +11,8 @@ class TodoRepository implements ITodoRepository
 {
     public function getAll(array $filters): LengthAwarePaginator
     {
-        $query = Todo::with('categories');
+        $query = Todo::with('categories')
+                    ->where('user_id', auth()->id());
 
         if (isset($filters['status'])) {
             $query->where('status', $filters['status']);
@@ -30,7 +31,7 @@ class TodoRepository implements ITodoRepository
 
     public function findById(int $id): ?Todo
     {
-        return Todo::with('categories')->find($id);
+        return Todo::with('categories')->find($id)->where('user_id', auth()->id());
     }
 
     public function create(array $data): Todo
@@ -41,40 +42,51 @@ class TodoRepository implements ITodoRepository
     public function update(int $id, array $data): ?Todo
     {
         $todo = $this->findById($id);
-        if ($todo) {
+
+        if ($todo && $todo->user_id === auth()->id()) {
             $todo->update($data);
             return $todo->fresh(); // Güncellenmiş modeli döndür
         }
+
         return null;
     }
 
     public function updateStatus(int $id, string $status): ?Todo
     {
         $todo = $this->findById($id);
-        if ($todo) {
+
+        if ($todo && $todo->user_id === auth()->id()) {
             $todo->update(['status' => $status]);
             return $todo->fresh();
         }
+
         return null;
     }
 
     public function delete(int $id): bool
     {
         $todo = $this->findById($id);
-        return $todo ? $todo->delete() : false;
+    
+        if ($todo && $todo->user_id === auth()->id()) {
+            return $todo->delete();
+        }
+    
+        return false;
     }
 
     public function search(string $query): Collection
     {
-        return Todo::where(function($q) use ($query) {
-            $q->where('title', 'like', "%{$query}%")
-              ->orWhere('description', 'like', "%{$query}%");
-        })->get();
+        return Todo::where('user_id', auth()->id())
+            ->where(function($q) use ($query) {
+                $q->where('title', 'like', "%{$query}%")
+                ->orWhere('description', 'like', "%{$query}%");
+            })->get();
     }
 
     public function getTodosByStatus(): array
     {
         return Todo::selectRaw('status, COUNT(*) as count')
+            ->where('user_id', auth()->id())
             ->groupBy('status')
             ->get()
             ->mapWithKeys(function ($item) {
@@ -86,6 +98,7 @@ class TodoRepository implements ITodoRepository
     public function getTodosByPriority(): array
     {
         return Todo::selectRaw('priority, COUNT(*) as count')
+            ->where('user_id', auth()->id())
             ->groupBy('priority')
             ->get()
             ->mapWithKeys(function ($item) {

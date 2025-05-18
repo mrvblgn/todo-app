@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from "react";
-import { getTodosByStatus, getAllTodos, updateTodoStatus } from "@/services/todoService";
+import { getTodosByStatus, getAllTodos, updateTodoStatus, getTodosByPriority } from "@/services/todoService";
 
 const DashboardComp = () => {
     const [stats, setStats] = useState([]);
+    const [priorityStats, setPriorityStats] = useState([]);
     const [upcomingTodos, setUpcomingTodos] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
@@ -12,6 +13,9 @@ const DashboardComp = () => {
             try {
                 const statsRes = await getTodosByStatus();
                 if (statsRes.status === "success") setStats(statsRes.data);
+
+                const priorityRes = await getTodosByPriority();
+                if(priorityRes.status === "success") setPriorityStats(priorityRes.data);
 
                 // Yaklaşan bitiş tarihli todo'lar
                 const todosRes = await getAllTodos({ due_soon: true });
@@ -55,6 +59,15 @@ const DashboardComp = () => {
                 ))}
             </div>
 
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
+                {priorityStats.map(stat => (
+                    <div key={stat.priorities} className="p-4 bg-gray-100 rounded shadow text-center">
+                        <div className="text-lg font-semibold">{stat.priorities}</div>
+                        <div className="text-2xl font-bold">{stat.count}</div>
+                    </div>
+                ))}
+            </div>
+
             {/* Yaklaşan bitiş tarihli todo'lar */}
             <div className="mb-8">
                 <h2 className="text-xl font-bold mb-4">Yaklaşan Bitiş Tarihli Todo'lar</h2>
@@ -76,6 +89,7 @@ const DashboardComp = () => {
                                     <option value="pending">Bekliyor</option>
                                     <option value="in_progress">Devam Ediyor</option>
                                     <option value="completed">Tamamlandı</option>
+                                    <option value="cancelled">İptal Edildi</option>
                                 </select>
                             </li>
                         ))}
