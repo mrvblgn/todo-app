@@ -1,42 +1,47 @@
-import React, { useEffect, useState } from "react";
-import { getAllCategories, createCategory, updateCategory, deleteCategory } from "@/services/categoryService";
+import React, { useEffect } from "react";
+import { useDispatch, useSelector } from 'react-redux';
+import { setCategories, setLoading, setError, addCategory, updateCategory, deleteCategory } from '@/store/slices/categorySlice';
+import { getAllCategories, createCategory, updateCategory as updateCategoryService, deleteCategory as deleteCategoryService } from "@/services/categoryService";
 import CategoryForm from "@/components/category/CategoryForm";
 
 const CategoryList = () => {
-    const [categories, setCategories] = useState([]);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState(null);
-    const [showForm, setShowForm] = useState(false);
-    const [editCategory, setEditCategory] = useState(null);
-    const [deleteCategoryId, setDeleteCategoryId] = useState(null);
+    const dispatch = useDispatch();
+    const { items: categories, loading, error } = useSelector(state => state.categories);
+    const [showForm, setShowForm] = React.useState(false);
+    const [editCategory, setEditCategory] = React.useState(null);
+    const [deleteCategoryId, setDeleteCategoryId] = React.useState(null);
 
     const fetchCategories = async () => {
-        setLoading(true);
+        dispatch(setLoading(true));
         try {
             const res = await getAllCategories();
-            if (res.status === "success") setCategories(res.data);
-            else setError("Failed to fetch categories");
+            if (res.status === "success") {
+                dispatch(setCategories(res.data));
+            } else {
+                dispatch(setError("Failed to fetch categories"));
+            }
         } catch (err) {
-            setError("Failed to fetch categories");
+            dispatch(setError("Failed to fetch categories"));
         } finally {
-            setLoading(false);
+            dispatch(setLoading(false));
         }
     };
 
     useEffect(() => {
         fetchCategories();
-    }, []);
+    }, [dispatch]);
 
     const handleSave = async (data) => {
         try {
             if (editCategory) {
-                await updateCategory(editCategory.id, data);
+                const updated = await updateCategoryService(editCategory.id, data);
+                dispatch(updateCategory(updated.data));
             } else {
-                await createCategory(data);
+                const created = await createCategory(data);
+                dispatch(addCategory(created.data));
             }
             setShowForm(false);
             setEditCategory(null);
-            fetchCategories();
         } catch {
             alert("Kategori kaydedilemedi!");
         }
@@ -44,77 +49,96 @@ const CategoryList = () => {
 
     const handleDelete = async () => {
         try {
-            await deleteCategory(deleteCategoryId);
+            await deleteCategoryService(deleteCategoryId);
+            dispatch(deleteCategory(deleteCategoryId));
             setDeleteCategoryId(null);
-            fetchCategories();
         } catch {
             alert("Kategori silinemedi!");
         }
     };
 
+    if (loading) return <div>Loading...</div>;
+    if (error) return <div className="text-red-500">{error}</div>;
+
     return (
         <div>
             <div className="flex justify-between items-center mb-4">
                 <h2 className="text-xl font-bold">Kategoriler</h2>
-                <button className="btn btn-primary" onClick={() => { setEditCategory(null); setShowForm(true); }}>
-                    + Kategori Ekle
+                <button
+                    className="btn btn-primary"
+                    onClick={() => setShowForm(true)}
+                >
+                    Yeni Kategori
                 </button>
             </div>
-            {loading ? (
-                <div>Loading...</div>
-            ) : error ? (
-                <div className="text-red-500">{error}</div>
-            ) : (
-                <ul className="space-y-2">
-                    {categories.map(cat => (
-                        <li key={cat.id} className="p-3 bg-gray-50 rounded-lg flex items-center justify-between">
-                            <div className="flex items-center gap-2">
-                                <span
-                                    className="inline-block w-4 h-4 rounded-full"
-                                    style={{ backgroundColor: cat.color }}
-                                    title={cat.color}
-                                ></span>
-                                <span className="font-medium">{cat.name}</span>
-                            </div>
-                            <div className="flex gap-2">
-                                <button className="btn btn-xs btn-secondary" onClick={() => { setEditCategory(cat); setShowForm(true); }}>
-                                    ✏️
-                                </button>
-                                <button className="btn btn-xs btn-danger" onClick={() => setDeleteCategoryId(cat.id)}>
-                                    🗑️
-                                </button>
-                            </div>
-                        </li>
-                    ))}
-                </ul>
-            )}
 
-            {/* Ekle/Düzenle Modalı */}
             {showForm && (
-                <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50">
-                    <div className="bg-white rounded-lg shadow-lg p-6 max-w-md w-full relative">
-                        <button
-                            className="absolute top-2 right-2 text-gray-500 hover:text-gray-800 text-2xl"
-                            onClick={() => setShowForm(false)}
-                            title="Kapat"
-                        >×</button>
-                        <CategoryForm
-                            initialData={editCategory}
-                            onSubmit={handleSave}
-                            onCancel={() => setShowForm(false)}
-                        />
-                    </div>
+                <div className="mb-4">
+                    <CategoryForm
+                        initialData={editCategory}
+                        onSubmit={handleSave}
+                        onCancel={() => {
+                            setShowForm(false);
+                            setEditCategory(null);
+                        }}
+                    />
                 </div>
             )}
 
-            {/* Silme Onay Modalı */}
+            <div className="grid grid-cols-1 gap-4">
+                {categories.map(category => (
+                    <div
+                        key={category.id}
+                        className="p-4 bg-white rounded shadow"
+                    >
+                        <div className="flex items-center justify-between mb-2">
+                            <div className="flex items-center gap-2">
+                                <span
+                                    className="w-4 h-4 rounded-full"
+                                    style={{ backgroundColor: category.color }}
+                                ></span>
+                                <h3 className="font-medium">{category.name}</h3>
+                            </div>
+                            <div className="flex gap-2">
+                                <button
+                                    className="btn btn-sm btn-secondary"
+                                    onClick={() => {
+                                        setEditCategory(category);
+                                        setShowForm(true);
+                                    }}
+                                >
+                                    Düzenle
+                                </button>
+                                <button
+                                    className="btn btn-sm btn-danger"
+                                    onClick={() => setDeleteCategoryId(category.id)}
+                                >
+                                    Sil
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                ))}
+            </div>
+
             {deleteCategoryId && (
                 <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50">
-                    <div className="bg-white rounded-lg shadow-lg p-6 max-w-md w-full relative">
-                        <div className="mb-4">Bu kategoriyi silmek istediğine emin misin?</div>
-                        <div className="flex gap-2">
-                            <button className="btn btn-danger" onClick={handleDelete}>Evet, Sil</button>
-                            <button className="btn btn-secondary" onClick={() => setDeleteCategoryId(null)}>Vazgeç</button>
+                    <div className="bg-white rounded-lg shadow-lg p-6 max-w-md w-full">
+                        <h3 className="text-lg font-bold mb-4">Kategori Sil</h3>
+                        <p className="mb-4">Bu kategoriyi silmek istediğinizden emin misiniz?</p>
+                        <div className="flex justify-end gap-2">
+                            <button
+                                className="btn btn-secondary"
+                                onClick={() => setDeleteCategoryId(null)}
+                            >
+                                İptal
+                            </button>
+                            <button
+                                className="btn btn-danger"
+                                onClick={handleDelete}
+                            >
+                                Sil
+                            </button>
                         </div>
                     </div>
                 </div>

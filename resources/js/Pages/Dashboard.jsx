@@ -12,7 +12,7 @@ const Dashboard = () => (
                     to="/" 
                     className="inline-block mt-4 text-blue-500 hover:text-blue-700"
                 >
-                    Back to Home
+                    Ana Sayfaya Dön
                 </Link>
             </div>
         </div>

@@ -23,7 +23,7 @@ class TodoRepository implements ITodoRepository
 
         $sort = $filters['sort'] ?? 'created_at';
         $order = $filters['order'] ?? 'desc';
-        $limit = min($filters['limit'] ?? 10, 50);
+        $limit = min($filters['limit'] ?? 5, 50);
 
         return $query->orderBy($sort, $order)->paginate($limit);
     }

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { createTodo } from "@/services/todoService";
+import { createTodo, updateTodo } from "@/services/todoService";
 import { getAllCategories } from "@/services/categoryService";
 import CategorySelector from "@/components/category/CategorySelector";
 import { validators, validateForm } from "@/utils/validators";
@@ -72,12 +72,14 @@ const TodoForm = ({ onTodoCreated, initialData, onSuccess, onCancel }) => {
         categories: formData.categories,
       };
 
-      const res = await createTodo(todoData);
-      if (onTodoCreated) onTodoCreated(res.data);
-      if (onSuccess) onSuccess(res.data);
-      
-      // Reset form if not editing
-      if (!initialData) {
+      let res;
+      if (initialData && initialData.id) {
+        res = await updateTodo(initialData.id, todoData);
+        if (onSuccess) onSuccess(res.data);
+      } else {
+        res = await createTodo(todoData);
+        if (onSuccess) onSuccess(res.data);
+        // Reset form
         setFormData({
           title: "",
           description: "",

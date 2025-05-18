@@ -11,19 +11,7 @@ const CategorySelector = ({ categories, value, onChange }) => (
   >
     {categories.map(cat => (
       <option key={cat.id} value={cat.id}>
-        {/* Renk göstergesi */}
-        <span
-          style={{
-            display: "inline-block",
-            width: 12,
-            height: 12,
-            backgroundColor: cat.color,
-            borderRadius: "50%",
-            marginRight: 6,
-            verticalAlign: "middle"
-          }}
-        ></span>
-        {cat.name}
+        ● {cat.name}
       </option>
     ))}
   </select>

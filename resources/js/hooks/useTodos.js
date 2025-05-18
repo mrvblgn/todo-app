@@ -1,25 +1,22 @@
-import { useState, useEffect } from "react";
+import { useSelector, useDispatch } from 'react-redux';
+import { setTodos, setLoading, setError } from '@/store/slices/todoSlice';
 import todoService from "@/services/todoService";
 
 export function useTodos() {
-  const [todos, setTodos] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const dispatch = useDispatch();
+  const { items: todos, loading, error } = useSelector(state => state.todos);
 
   const fetchTodos = async () => {
-    setLoading(true);
+    dispatch(setLoading(true));
     try {
       const data = await todoService.getTodos();
-      setTodos(data);
+      dispatch(setTodos(data));
     } catch (err) {
-      setError(err);
+      dispatch(setError(err.message));
+    } finally {
+      dispatch(setLoading(false));
     }
-    setLoading(false);
   };
-
-  useEffect(() => {
-    fetchTodos();
-  }, []);
 
   return { todos, loading, error, refetch: fetchTodos };
 }

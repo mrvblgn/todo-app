@@ -13,6 +13,7 @@ const TodoPage = () => {
     };
 
     const handlePageChange = (newPage) => {
+        if (newPage < 1 ) return;
         setPage(newPage);
     };
 

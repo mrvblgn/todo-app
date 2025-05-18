@@ -4,6 +4,7 @@ const initialState = {
     items: [],
     loading: false,
     error: null,
+    meta: null
 };
 
 const todoSlice = createSlice({
@@ -11,7 +12,8 @@ const todoSlice = createSlice({
     initialState,
     reducers: {
         setTodos: (state, action) => {
-            state.items = action.payload;
+            state.items = action.payload.data;
+            state.meta = action.payload.meta;
         },
         addTodo: (state, action) => {
             state.items.push(action.payload);

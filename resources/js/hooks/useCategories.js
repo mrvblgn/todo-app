@@ -1,25 +1,22 @@
-import { useState, useEffect } from "react";
+import { useSelector, useDispatch } from 'react-redux';
+import { setCategories, setLoading, setError } from '@/store/slices/categorySlice';
 import categoryService from "@/services/categoryService";
 
 export function useCategories() {
-  const [categories, setCategories] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const dispatch = useDispatch();
+  const { items: categories, loading, error } = useSelector(state => state.categories);
 
   const fetchCategories = async () => {
-    setLoading(true);
+    dispatch(setLoading(true));
     try {
       const data = await categoryService.getCategories();
-      setCategories(data);
+      dispatch(setCategories(data));
     } catch (err) {
-      setError(err);
+      dispatch(setError(err.message));
+    } finally {
+      dispatch(setLoading(false));
     }
-    setLoading(false);
   };
-
-  useEffect(() => {
-    fetchCategories();
-  }, []);
 
   return { categories, loading, error, refetch: fetchCategories };
 }
