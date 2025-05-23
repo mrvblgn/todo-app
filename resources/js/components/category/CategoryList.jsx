@@ -146,15 +146,17 @@ const CategoryList = () => {
                         <div>
                             <strong>Todo'lar:</strong>
                             <ul className="list-disc ml-6">
-                                {categoryTodos[category.id]
-                                    ? (categoryTodos[category.id].length === 0
-                                        ? <li>Bu kategoriye ait todo yok.</li>
-                                        : categoryTodos[category.id].map(todo => (
+                                {Array.isArray(categoryTodos[category.id]) ? (
+                                    categoryTodos[category.id].length === 0 ? (
+                                        <li>Bu kategoriye ait todo yok.</li>
+                                    ) : (
+                                        categoryTodos[category.id].map(todo => (
                                             <li key={todo.id}>{todo.title}</li>
                                         ))
                                     )
-                                    : <li>Yükleniyor...</li>
-                                }
+                                ) : (
+                                    <li>Yükleniyor...</li>
+                                )}
                             </ul>
                         </div>
                     </div>

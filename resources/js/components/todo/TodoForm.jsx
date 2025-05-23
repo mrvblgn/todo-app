@@ -1,8 +1,10 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect, useState } from "react";
+import { useForm } from "react-hook-form";
+import { yupResolver } from "@hookform/resolvers/yup";
+import * as yup from "yup";
 import { createTodo, updateTodo } from "@/services/todoService";
 import { getAllCategories } from "@/services/categoryService";
 import CategorySelector from "@/components/category/CategorySelector";
-import { validators, validateForm } from "@/utils/validators";
 
 const priorities = [
   { value: "low", label: "Low" },
@@ -10,25 +12,40 @@ const priorities = [
   { value: "high", label: "High" },
 ];
 
-const todoRules = {
-  title: [validators.required, validators.todoTitle],
-  description: [validators.todoDescription],
-  dueDate: [validators.dueDate],
-  priority: [validators.required],
-  categories: [validators.required]
-};
+const schema = yup.object().shape({
+  title: yup
+    .string()
+    .required("Başlık zorunludur.")
+    .matches(/^[a-zA-ZçÇğĞıİöÖşŞüÜ0-9 ]+$/, "Geçersiz başlık."),
+  description: yup
+    .string()
+    .matches(/^[a-zA-ZçÇğĞıİöÖşŞüÜ0-9 ]+$/, "Geçersiz açıklama."),
+  dueDate: yup
+    .date()
+    .min(new Date(), "Bitiş tarihi bugünden sonra olmalıdır."),
+  priority: yup.string().required("Öncelik zorunludur."),
+  categories: yup.array().min(1, "En az bir kategori seçmelisiniz.")
+});
 
 const TodoForm = ({ onTodoCreated, initialData, onSuccess, onCancel }) => {
-  const [formData, setFormData] = useState({
-    title: initialData?.title || "",
-    description: initialData?.description || "",
-    priority: initialData?.priority || "medium",
-    dueDate: initialData?.due_date || "",
-    categories: initialData?.categories || []
-  });
   const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [errors, setErrors] = useState({});
+
+  const {
+    register,
+    handleSubmit,
+    setValue,
+    formState: { errors }
+  } = useForm({
+    resolver: yupResolver(schema),
+    defaultValues: {
+      title: initialData?.title || "",
+      description: initialData?.description || "",
+      priority: initialData?.priority || "medium",
+      dueDate: initialData?.due_date || "",
+      categories: initialData?.categories || []
+    }
+  });
 
   useEffect(() => {
     const fetchCategories = async () => {
@@ -38,38 +55,19 @@ const TodoForm = ({ onTodoCreated, initialData, onSuccess, onCancel }) => {
     fetchCategories();
   }, []);
 
-  const handleChange = (field, value) => {
-    setFormData(prev => ({
-      ...prev,
-      [field]: value
-    }));
-    // Clear error when field is modified
-    if (errors[field]) {
-      setErrors(prev => ({
-        ...prev,
-        [field]: ""
-      }));
-    }
+  const handleCategoriesChange = (value) => {
+    setValue("categories", value);
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    
-    // Validate form
-    const validationErrors = validateForm(formData, todoRules);
-    if (Object.keys(validationErrors).length > 0) {
-      setErrors(validationErrors);
-      return;
-    }
-
+  const onSubmit = async (data) => {
     setLoading(true);
     try {
       const todoData = {
-        title: formData.title,
-        description: formData.description,
-        priority: formData.priority,
-        due_date: formData.dueDate,
-        categories: formData.categories,
+        title: data.title,
+        description: data.description,
+        priority: data.priority,
+        due_date: data.dueDate,
+        categories: data.categories,
       };
 
       let res;
@@ -80,96 +78,88 @@ const TodoForm = ({ onTodoCreated, initialData, onSuccess, onCancel }) => {
         res = await createTodo(todoData);
         if (onSuccess) onSuccess(res.data);
         // Reset form
-        setFormData({
-          title: "",
-          description: "",
-          priority: "medium",
-          dueDate: "",
-          categories: []
-        });
+        setValue("title", "");
+        setValue("description", "");
+        setValue("priority", "medium");
+        setValue("dueDate", "");
+        setValue("categories", []);
       }
     } catch (err) {
-      setErrors({
-        submit: "Failed to create todo. Please try again."
-      });
+      setValue("submit", "Failed to create todo. Please try again.");
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4">
+    <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
       <div>
         <label className="block font-medium">Başlık</label>
-        <input 
+        <input
           className={`input ${errors.title ? 'border-red-500' : ''}`}
-          value={formData.title}
-          onChange={e => handleChange('title', e.target.value)}
+          {...register('title')}
         />
-        {errors.title && <p className="text-red-500 text-sm mt-1">{errors.title}</p>}
+        {errors.title && <p className="text-red-500 text-sm mt-1">{errors.title.message}</p>}
       </div>
 
       <div>
         <label className="block font-medium">Açıklama</label>
-        <textarea 
+        <textarea
           className={`input ${errors.description ? 'border-red-500' : ''}`}
-          value={formData.description}
-          onChange={e => handleChange('description', e.target.value)}
+          {...register('description')}
         />
-        {errors.description && <p className="text-red-500 text-sm mt-1">{errors.description}</p>}
+        {errors.description && <p className="text-red-500 text-sm mt-1">{errors.description.message}</p>}
       </div>
 
       <div>
         <label className="block font-medium">Priority</label>
-        <select 
+        <select
           className={`input ${errors.priority ? 'border-red-500' : ''}`}
-          value={formData.priority}
-          onChange={e => handleChange('priority', e.target.value)}
+          {...register('priority')}
         >
           {priorities.map(opt => (
             <option key={opt.value} value={opt.value}>{opt.label}</option>
           ))}
         </select>
-        {errors.priority && <p className="text-red-500 text-sm mt-1">{errors.priority}</p>}
+        {errors.priority && <p className="text-red-500 text-sm mt-1">{errors.priority.message}</p>}
       </div>
 
       <div>
         <label className="block font-medium">Bitiş Tarihi</label>
-        <input 
+        <input
           className={`input ${errors.dueDate ? 'border-red-500' : ''}`}
           type="date"
-          value={formData.dueDate}
-          onChange={e => handleChange('dueDate', e.target.value)}
+          {...register('dueDate')}
         />
-        {errors.dueDate && <p className="text-red-500 text-sm mt-1">{errors.dueDate}</p>}
+        {errors.dueDate && <p className="text-red-500 text-sm mt-1">{errors.dueDate.message}</p>}
       </div>
 
       <div>
         <label className="block font-medium">Kategoriler</label>
         <CategorySelector
           categories={categories}
-          value={formData.categories}
-          onChange={value => handleChange('categories', value)}
+          value={register('categories').value}
+          onChange={handleCategoriesChange}
         />
-        {errors.categories && <p className="text-red-500 text-sm mt-1">{errors.categories}</p>}
+        {errors.categories && <p className="text-red-500 text-sm mt-1">{errors.categories.message}</p>}
       </div>
 
       {errors.submit && (
-        <p className="text-red-500 text-sm">{errors.submit}</p>
+        <p className="text-red-500 text-sm">{errors.submit.message}</p>
       )}
 
       <div className="flex gap-2">
-        <button 
-          className="btn btn-primary" 
+        <button
+          className="btn btn-primary"
           type="submit"
           disabled={loading}
         >
           {loading ? "Saving..." : initialData ? "Todo'yu Güncelle" : "Todo Ekle"}
         </button>
         {onCancel && (
-          <button 
-            className="btn btn-secondary" 
-            type="button" 
+          <button
+            className="btn btn-secondary"
+            type="button"
             onClick={onCancel}
           >
             İptal Et

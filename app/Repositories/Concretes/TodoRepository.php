@@ -31,7 +31,9 @@ class TodoRepository implements ITodoRepository
 
     public function findById(int $id): ?Todo
     {
-        return Todo::with('categories')->find($id)->where('user_id', auth()->id());
+        return Todo::with('categories')
+            ->where('user_id', auth()->id())
+            ->find($id);
     }
 
     public function create(array $data): Todo
@@ -43,7 +45,7 @@ class TodoRepository implements ITodoRepository
     {
         $todo = $this->findById($id);
 
-        if ($todo && $todo->user_id === auth()->id()) {
+        if ($todo) {
             $todo->update($data);
             return $todo->fresh(); // Güncellenmiş modeli döndür
         }
@@ -55,7 +57,7 @@ class TodoRepository implements ITodoRepository
     {
         $todo = $this->findById($id);
 
-        if ($todo && $todo->user_id === auth()->id()) {
+        if ($todo) {
             $todo->update(['status' => $status]);
             return $todo->fresh();
         }
@@ -67,7 +69,7 @@ class TodoRepository implements ITodoRepository
     {
         $todo = $this->findById($id);
     
-        if ($todo && $todo->user_id === auth()->id()) {
+        if ($todo) {
             return $todo->delete();
         }
     

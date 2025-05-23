@@ -1,55 +1,44 @@
 import React, { useState } from "react";
-import { validators, validateForm } from "@/utils/validators";
+import { useForm } from "react-hook-form";
+import { yupResolver } from "@hookform/resolvers/yup";
+import * as yup from "yup";
 
-const categoryRules = {
-  name: [validators.required, validators.categoryName],
-  color: [validators.required]
-};
+const schema = yup.object().shape({
+  name: yup
+    .string()
+    .required("Kategori adı zorunludur.")
+    .matches(/^[a-zA-ZçÇğĞıİöÖşŞüÜ0-9 ]+$/, "Geçersiz kategori adı."),
+  color: yup.string().required("Kategori rengi zorunludur.")
+});
 
 const CategoryForm = ({ initialData, onSubmit, onCancel }) => {
   const safeData = initialData || {};
-  const [formData, setFormData] = useState({
-    name: safeData.name || "",
-    color: safeData.color || "#60a5fa"
+  const {
+    register,
+    handleSubmit,
+    setValue,
+    formState: { errors }
+  } = useForm({
+    resolver: yupResolver(schema),
+    defaultValues: {
+      name: safeData.name || "",
+      color: safeData.color || "#60a5fa"
+    }
   });
-  const [errors, setErrors] = useState({});
 
-  const handleChange = (field, value) => {
-    setFormData(prev => ({
-      ...prev,
-      [field]: value
-    }));
-
-    if (errors[field]) {
-      setErrors(prev => ({
-        ...prev,
-        [field]: ""
-      }));
-    }
-  };
-
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    
-    const validationErrors = validateForm(formData, categoryRules);
-    if (Object.keys(validationErrors).length > 0) {
-      setErrors(validationErrors);
-      return;
-    }
-
-    onSubmit(formData);
+  const handleColorChange = (e) => {
+    setValue("color", e.target.value);
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4">
+    <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
       <div>
         <label className="block font-medium">Kategori Adı</label>
-        <input 
+        <input
           className={`input ${errors.name ? 'border-red-500' : ''}`}
-          value={formData.name}
-          onChange={e => handleChange('name', e.target.value)}
+          {...register('name')}
         />
-        {errors.name && <p className="text-red-500 text-sm mt-1">{errors.name}</p>}
+        {errors.name && <p className="text-red-500 text-sm mt-1">{errors.name.message}</p>}
       </div>
 
       <div>
@@ -57,10 +46,10 @@ const CategoryForm = ({ initialData, onSubmit, onCancel }) => {
         <input
           type="color"
           className={`w-12 h-8 p-0 border-0 ${errors.color ? 'border-red-500' : ''}`}
-          value={formData.color}
-          onChange={e => handleChange('color', e.target.value)}
+          {...register('color')}
+          onChange={handleColorChange}
         />
-        {errors.color && <p className="text-red-500 text-sm mt-1">{errors.color}</p>}
+        {errors.color && <p className="text-red-500 text-sm mt-1">{errors.color.message}</p>}
       </div>
 
       <div className="flex gap-2">
@@ -68,9 +57,9 @@ const CategoryForm = ({ initialData, onSubmit, onCancel }) => {
           {initialData ? "Kategoriyi Güncelle" : "Kategori Oluştur"}
         </button>
         {onCancel && (
-          <button 
-            className="btn btn-secondary" 
-            type="button" 
+          <button
+            className="btn btn-secondary"
+            type="button"
             onClick={onCancel}
           >
             İptal Et
